@@ -41,6 +41,33 @@ if ($cfg && $cfg->isKnowledgebaseEnabled()) { ?>
         echo  '<h1>'.__('Welcome to the Support Center').'</h1>';
     ?>
     </div>
+
+    <?php
+    // [M.A.I.T.S] Guia rapida para quien entra por primera vez
+    $maits_sesion = $thisclient && $thisclient->isValid() && !$thisclient->isGuest();
+    ?>
+    <section class="maits-como" aria-labelledby="maits-como-titulo">
+        <h2 id="maits-como-titulo">¿Cómo reporto un problema?</h2>
+        <ol class="maits-pasos">
+            <li><span class="maits-num">1</span>
+                <div><strong>Inicia sesión</strong>
+                <p>Entra con tu correo institucional (@saltillo.tecnm.mx).</p></div></li>
+            <li><span class="maits-num">2</span>
+                <div><strong>Crea tu ticket</strong>
+                <p>Elige el área del problema y cuéntanos qué pasa y en qué lugar.</p></div></li>
+            <li><span class="maits-num">3</span>
+                <div><strong>Revisa su avance</strong>
+                <p>Recibirás un número de ticket. En «Mis tickets» verás las respuestas del personal.</p></div></li>
+        </ol>
+        <div class="maits-botones izquierda">
+            <a class="maits-boton principal" href="<?php echo ROOT_PATH; ?>open.php"><i class="icon-plus"></i> Crear un ticket</a>
+            <?php if ($maits_sesion) { ?>
+            <a class="maits-boton" href="<?php echo ROOT_PATH; ?>tickets.php"><i class="icon-list"></i> Ver mis tickets</a>
+            <?php } else { ?>
+            <a class="maits-boton" href="<?php echo ROOT_PATH; ?>login.php"><i class="icon-signin"></i> Iniciar sesión</a>
+            <?php } ?>
+        </div>
+    </section>
 </div>
 <div class="clear"></div>
 

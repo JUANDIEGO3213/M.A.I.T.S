@@ -16,7 +16,15 @@ if ($thisstaff && $thisstaff->is2FAPending())
         <span class="valign-helper"></span>
         <img src="logo.php?login" alt="osTicket :: <?php echo __('Staff Control Panel');?>" />
     </a></h1>
-    <h3 id="login-message"><?php echo Format::htmlchars($msg); ?></h3>
+    <h2 class="maits-titulo">Acceso para agentes</h2>
+    <p class="maits-sub">Solo para el personal que atiende los tickets.</p>
+<?php
+    // [M.A.I.T.S] El aviso por defecto ("Autenticacion Requerida") ya no hace falta
+    // porque arriba esta el titulo; aqui solo aparecen los errores (ej. contrasena incorrecta).
+    if (($content && $msg == $content->getLocalName()) || $msg == __('Authentication Required'))
+        $msg = '';
+?>
+    <h3 id="login-message" role="alert"><?php echo Format::htmlchars($msg); ?></h3>
     <div class="banner"><small><?php echo ($content) ? Format::display($content->getLocalBody()) : ''; ?></small></div>
     <div id="loading" style="display:none;" class="dialog">
         <h1><i class="icon-spinner icon-spin icon-large"></i>
@@ -60,12 +68,21 @@ if ($thisstaff && $thisstaff->is2FAPending())
 <?php
 if (($bks=StaffAuthenticationBackend::getExternal())) { ?>
 <div class="or">
-    <hr/>
+    <span>o bien</span>
 </div><?php
-    foreach ($bks as $bk) { ?>
+    if (count($bks) == 1) {
+        // [M.A.I.T.S] Boton del correo institucional con texto claro
+        $bk = reset($bks); ?>
+<a class="maits-externo" href="login.php?do=ext&amp;bk=<?php echo urlencode($bk->getBkId()); ?>"><i class="icon-envelope"></i> Entrar con correo institucional</a><?php
+    } else {
+        foreach ($bks as $bk) { ?>
 <div class="external-auth"><?php $bk->renderExternalLink(); ?></div><br/><?php
+        }
     }
 } ?>
+
+    <!-- [M.A.I.T.S] Para quien entro aqui por error -->
+    <a class="maits-regresar" href="<?php echo ROOT_PATH; ?>index.php"><i class="icon-arrow-left"></i> Regresar a la página de usuarios</a>
 
     <div id="company">
         <div class="content">

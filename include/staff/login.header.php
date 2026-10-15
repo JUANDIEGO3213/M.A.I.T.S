@@ -3,13 +3,15 @@ defined('OSTSCPINC') or die('Invalid path');
 header("Content-Security-Policy: frame-ancestors ".$cfg->getAllowIframes()."; script-src 'self' 'unsafe-inline'; object-src 'none'");
 ?>
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="es" lang="es">
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="refresh" content="7200" />
-    <title>osTicket :: <?php echo __('Agent Login'); ?></title>
+    <title><?php echo Format::htmlchars($cfg->getTitle() ?: 'osTicket'); ?> :: Acceso agentes</title>
     <link rel="stylesheet" href="css/login.css" type="text/css" />
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css?8d38b06"/>
+    <!-- [M.A.I.T.S] Tamano adaptable y boton "Regresar" -->
+    <link rel="stylesheet" href="css/maits-login.css?v=2" type="text/css" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="pragma" content="no-cache" />

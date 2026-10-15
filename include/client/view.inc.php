@@ -30,7 +30,7 @@ if ($thisclient && $thisclient->isGuest()
 
 <?php } ?>
 
-<table width="800" cellpadding="1" cellspacing="0" border="0" id="ticketInfo">
+<table width="100%" cellpadding="1" cellspacing="0" border="0" id="ticketInfo">
     <tr>
         <td colspan="2" width="100%">
             <h1>
@@ -39,7 +39,12 @@ if ($thisclient && $thisclient->isGuest()
                 <?php $subject_field = TicketForm::getInstance()->getField('subject');
                     echo $subject_field->display($ticket->getSubject()); ?>
                 </b>
-                <small>#<?php echo $ticket->getNumber(); ?></small>
+                <small title="Número de ticket">#<?php echo $ticket->getNumber(); ?></small>
+                <?php // [M.A.I.T.S] Estado visible junto al titulo
+                if ($S = $ticket->getStatus()) {
+                    printf('<span class="maits-estado %s">%s</span>',
+                        $ticket->isClosed() ? 'closed' : 'open', Format::htmlchars($S->getLocalName()));
+                } ?>
 <div class="pull-right">
       <a class="action-button" href="tickets.php?a=print&id=<?php
           echo $ticket->getId(); ?>"><i class="icon-print"></i> <?php echo __('Print'); ?></a>
@@ -165,12 +170,11 @@ if ((!$ticket->isClosed() || $ticket->isReopenable()) && !$blockReply) { ?>
 <form id="reply" action="tickets.php?id=<?php echo $ticket->getId();
 ?>#reply" name="reply" method="post" enctype="multipart/form-data">
     <?php csrf_token(); ?>
-    <h2><?php echo __('Post a Reply');?></h2>
+    <h2>Agregar una respuesta</h2>
     <input type="hidden" name="id" value="<?php echo $ticket->getId(); ?>">
     <input type="hidden" name="a" value="reply">
     <div>
-        <p><em><?php
-         echo __('To best assist you, we request that you be specific and detailed'); ?></em>
+        <p class="maits-ayuda">Escribe aquí si quieres dar más detalles o contestar al personal de soporte. Puedes adjuntar fotos del problema.
         <font class="error">*&nbsp;<?php echo $errors['message']; ?></font>
         </p>
         <textarea name="<?php echo $messageField->getFormName(); ?>" id="message" cols="50" rows="9" wrap="soft"
@@ -190,10 +194,10 @@ echo $attrs; ?>><?php echo $draft ?: $info['message'];
         <?php echo __('Ticket will be reopened on message post'); ?>
     </div>
 <?php } ?>
-    <p style="text-align:center">
-        <input type="submit" value="<?php echo __('Guardar y Enviar');?>">
-        <input type="reset" value="<?php echo __('Reset');?>">
-        <input type="button" value="<?php echo __('Cancel');?>" onClick="history.go(-1)">
+    <p class="maits-botones">
+        <input type="submit" value="Guardar y enviar">
+        <input type="reset" value="Borrar texto">
+        <input type="button" value="Volver a mis tickets" onClick="window.location.href='tickets.php'">
     </p>
 </form>
 <?php

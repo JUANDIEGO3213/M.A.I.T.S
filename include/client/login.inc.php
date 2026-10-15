@@ -44,7 +44,6 @@ if ($content) {
     </p>
     </div>
     <?php endif; ?>
-    <div style="display:inline-block;padding: 15px;vertical-align:top">
 <?php
 
 $ext_bks = array();
@@ -52,32 +51,38 @@ foreach (UserAuthenticationBackend::allRegistered() as $bk)
     if ($bk instanceof ExternalAuthentication)
         $ext_bks[] = $bk;
 
-if (count($ext_bks)) {
+if (count($ext_bks) == 1) {
+    // [M.A.I.T.S] Un solo acceso (correo institucional): boton grande y explicado
+    $bk = $ext_bks[0]; ?>
+    <div class="maits-login-icono"><i class="icon-envelope"></i></div>
+    <div class="maits-login-titulo">Entra con tu correo institucional</div>
+    <a class="maits-boton principal" href="login.php?do=ext&amp;bk=<?php
+        echo urlencode($bk->getBkId()); ?>"><i class="icon-signin"></i> Iniciar sesión con correo institucional</a>
+    <p class="maits-ayuda">Se abrirá la página de inicio de sesión de Microsoft.
+    Escribe tu correo <strong>@saltillo.tecnm.mx</strong> y la misma contraseña que usas en tu correo.</p>
+<?php
+} elseif (count($ext_bks)) {
     foreach ($ext_bks as $bk) { ?>
 <div class="external-auth"><?php $bk->renderExternalLink(); ?></div><?php
     }
-    /*echo '<hr style="width:90%;height:3px;background-color:#999;border:none;margin:10px auto;"/>';*/
 }
 if ($cfg && $cfg->isClientRegistrationEnabled()) { ?>
-    <div style="margin-bottom: 5px">
+    <p class="maits-ayuda">
     <?php echo __('Not yet registered?'); ?> <a href="account.php?do=create"><?php echo __('Create an account'); ?></a>
-    </div>
+    </p>
 <?php } ?>
-    <div>
-    <?php /*
-    <b><?php echo __("I'm an agent"); ?></b> —
-    <a href="<?php echo ROOT_PATH; ?>scp/"><?php echo __('sign in here'); ?></a>
-    */ ?>
-    </div>
-    </div>
 </div>
 </form>
-<br>
-<p>
+<p class="maits-pie-login">
 <?php
-if ($cfg->getClientRegistrationMode() != 'disabled'
-    || !$cfg->isClientLoginRequired()) {
+// [M.A.I.T.S] Antes este texto mandaba a "abrir un ticket", pero como se
+// necesita iniciar sesion, el enlace regresaba a esta misma pagina.
+// Solo se muestra si algun dia se permiten tickets sin iniciar sesion.
+if (!$cfg->isClientLoginRequired()) {
     echo sprintf(__('If this is your first time contacting us or you\'ve lost the ticket number, please %s open a new ticket %s'),
         '<a href="open.php">', '</a>');
-} ?>
+} else { ?>
+    ¿Eres parte del personal que atiende los tickets? Entra por
+    <a href="<?php echo ROOT_PATH; ?>scp/login.php">Acceso agentes</a>.
+<?php } ?>
 </p>

@@ -36,7 +36,7 @@ if (osTicket::is_ie())
     <meta name="keywords" content="osTicket, Customer support system, support ticket system">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/osticket.css?8d38b06" media="screen"/>
-    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/theme.css?8d38b06" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/theme.css?8d38b06-maits2" media="screen"/>
     <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/print.css?8d38b06" media="print"/>
     <link rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/typeahead.css?8d38b06"
          media="screen" />
@@ -49,6 +49,8 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/flags.css?8d38b06"/>
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css?8d38b06"/>
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/select2.min.css?8d38b06"/>
+    <!-- Estilos de M.A.I.T.S (van al final para tener prioridad) -->
+    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/maits.css?v=2" media="screen"/>
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-32x32.png" sizes="64x64" />
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-16x16.png" sizes="16x16" />
@@ -98,31 +100,30 @@ if (osTicket::is_ie())
             echo sprintf('<div class="notice_bar">%s</div>', $ost->getNotice());
         ?>
         <div id="header">
-            <div class="pull-right flush-right">
-            <p>
+            <a id="logo" href="<?php echo ROOT_PATH; ?>index.php"
+            title="Ir al inicio">
+                <span class="valign-helper"></span>
+                <img src="<?php echo ROOT_PATH; ?>logo.php" border=0 alt="<?php
+                echo $ost->getConfig()->getTitle(); ?>">
+            </a>
+            <div class="maits-cuenta">
              <?php
+                // [M.A.I.T.S] Zona de la cuenta: nombre del usuario y botones claros
                 if ($thisclient && is_object($thisclient) && $thisclient->isValid()
-                    && !$thisclient->isGuest()) {
-                 echo Format::htmlchars($thisclient->getName()).'&nbsp;|';
-                 ?>
-                <a href="<?php echo ROOT_PATH; ?>profile.php"><?php echo __('Profile'); ?></a> |
-                <a href="<?php echo ROOT_PATH; ?>tickets.php"><?php echo sprintf(__('Tickets <b>(%d)</b>'), $thisclient->getNumTickets()); ?></a> |
-                <a href="<?php echo $signout_url; ?>"><?php echo __('Sign Out'); ?></a>
+                    && !$thisclient->isGuest()) { ?>
+                <span class="maits-hola">Hola, <strong><?php echo Format::htmlchars($thisclient->getName()); ?></strong></span>
+                <a href="<?php echo ROOT_PATH; ?>profile.php"><i class="icon-user"></i> Mi perfil</a>
+                <a href="<?php echo $signout_url; ?>"><i class="icon-signout"></i> Cerrar sesión</a>
             <?php
             } elseif($nav) {
-                if ($cfg->getClientRegistrationMode() == 'public') { ?>
-                    <?php echo __('Guest User'); ?> | <?php
-                }
                 if ($thisclient && $thisclient->isValid() && $thisclient->isGuest()) { ?>
-                    <a href="<?php echo $signout_url; ?>"><?php echo __('Sign Out'); ?></a><?php
+                    <a href="<?php echo $signout_url; ?>"><i class="icon-signout"></i> Cerrar sesión</a><?php
                 }
                 elseif ($cfg->getClientRegistrationMode() != 'disabled') { ?>
-                    <a href="<?php echo $signin_url; ?>"><?php echo __('Sign In'); ?></a>
+                    <a class="maits-entrar" href="<?php echo $signin_url; ?>"><i class="icon-signin"></i> Iniciar sesión</a>
 <?php
                 }
             } ?>
-            </p>
-            <p>
 <?php
 if (($all_langs = Internationalization::getConfiguredSystemLanguages())
     && (count($all_langs) > 1)
@@ -138,31 +139,39 @@ if (($all_langs = Internationalization::getConfiguredSystemLanguages())
             ?>" title="<?php echo Internationalization::getLanguageDescription($code); ?>">&nbsp;</a>
 <?php }
 } ?>
-            </p>
             </div>
-            <a class="pull-left" id="logo" href="<?php echo ROOT_PATH; ?>index.php"
-            title="<?php echo __('Support Center'); ?>">
-                <span class="valign-helper"></span>
-                <img src="<?php echo ROOT_PATH; ?>logo.php" border=0 alt="<?php
-                echo $ost->getConfig()->getTitle(); ?>">
-            </a>
         </div>
         <div class="clear"></div>
         <?php
         if($nav){ ?>
         <ul id="nav" class="flush-left">
             <?php
+            // [M.A.I.T.S] Nombres e iconos del menu mas faciles de entender
+            $maits_menu = array(
+                'home'    => array('icon-home',   'Inicio'),
+                'new'     => array('icon-plus',   'Crear un ticket'),
+                'tickets' => array('icon-list',   'Mis tickets'),
+                'kb'      => array('icon-book',   null),
+            );
             if($nav && ($navs=$nav->getNavLinks()) && is_array($navs)){
                 foreach($navs as $name =>$nav) {
-		    if($name == 'status') continue; // oculta la opcion "Ver Estado de un Ticket" de la pagina inical
-                    echo sprintf('<li><a class="%s %s" href="%s">%s</a></li>%s',$nav['active']?'active':'',$name,(ROOT_PATH.$nav['href']),$nav['desc'],"\n");
+                    if($name == 'status') continue; // oculta la opcion "Ver Estado de un Ticket" de la pagina inical
+                    $icono = isset($maits_menu[$name]) ? $maits_menu[$name][0] : 'icon-circle-blank';
+                    $texto = (isset($maits_menu[$name]) && $maits_menu[$name][1])
+                        ? $maits_menu[$name][1] : strip_tags($nav['desc']);
+                    if ($name == 'tickets' && $thisclient && $thisclient->isValid())
+                        $texto .= sprintf(' <span class="maits-contador" title="Tickets en total">%d</span>',
+                            $thisclient->getNumTickets());
+                    echo sprintf('<li><a class="%s %s" href="%s"%s><i class="%s"></i> %s</a></li>%s',
+                        $nav['active']?'active':'', $name, (ROOT_PATH.$nav['href']),
+                        $nav['active']?' aria-current="page"':'', $icono, $texto, "\n");
                 }
             } ?>
             <?php
                  $clienteLogueado = $thisclient && $thisclient->isValid();
                  $esAgente = $clienteLogueado && Staff::getIdByEmail($thisclient->getEmail());
                  if (!$clienteLogueado || $esAgente) { ?>
-                     <li><a class="agent" href="<?php echo ROOT_PATH; ?>scp/login.php">Acceso Agentes</a></li>
+                     <li class="maits-nav-agentes"><a class="agent" href="<?php echo ROOT_PATH; ?>scp/login.php" title="Solo para el personal que atiende los tickets"><i class="icon-briefcase"></i> Acceso agentes</a></li>
                <?php }?>
         </ul>
         <?php
