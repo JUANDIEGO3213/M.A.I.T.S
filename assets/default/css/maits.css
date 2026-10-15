@@ -1,0 +1,560 @@
+/* =====================================================================
+   M.A.I.T.S - Estilos del portal de usuarios
+   ---------------------------------------------------------------------
+   Se carga DESPUES de theme.css, asi que lo que aqui se define tiene
+   prioridad. El fondo (fondo MAITS.jpg) y el recuadro translucido
+   (#container) se definen en theme.css y NO se modifican aqui.
+
+   Tamano adaptable: en lugar de "zoom" (que descuadraba las ventanas
+   emergentes), todo se mide en "rem" y el tamano base del texto crece
+   en pantallas grandes (ver "Tamano segun la pantalla").
+   ===================================================================== */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../fonts/atkinson/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../fonts/atkinson/atkinson-hyperlegible-latin-400-italic.woff2") format("woff2");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../fonts/atkinson/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../fonts/atkinson/atkinson-hyperlegible-latin-700-italic.woff2") format("woff2");
+  font-weight: 700; font-style: italic; font-display: swap;
+}
+
+/* ---------- Colores y medidas ---------- */
+:root {
+  --azul: #1f3a6e;          /* color principal (titulos, barra de menu) */
+  --azul-oscuro: #142a52;
+  --azul-claro: #e9eef7;    /* fondos suaves */
+  --turquesa: #4fd6dc;      /* el mismo tono de las figuras del fondo */
+  --turquesa-texto: #0a6d74;/* turquesa oscuro para texto sobre blanco */
+  --tinta: #1b2433;         /* texto normal */
+  --gris: #556074;          /* textos de ayuda */
+  --borde: #c5ccd8;
+  --hoja: #ffffff;
+  --ok: #1d6b45;   --ok-fondo: #e2f3e9;
+  --aviso: #8a5a00; --aviso-fondo: #fff4d6;
+  --error: #a32020; --error-fondo: #fde8e8;
+  --radio: 10px;
+  --letra: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+}
+
+/* ---------- Tamano segun la pantalla ---------- */
+html { font-size: 100%; }                                 /* 16px: laptops */
+@media (min-width: 1600px) { html { font-size: 112.5%; } } /* 18px: Full HD */
+@media (min-width: 2200px) { html { font-size: 125%; } }   /* 20px: 2K / 4K */
+@media (max-width: 600px)  { html { font-size: 93.75%; } } /* 15px: celular */
+
+body {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+body, input, select, textarea, button {
+  font-family: var(--letra);
+  color: var(--tinta);
+}
+
+/* ---------- Recuadro principal (solo medidas; el color queda igual) ---------- */
+#container {
+  width: min(64rem, calc(100% - 2rem));
+  box-sizing: border-box;
+  padding-bottom: 1.25rem;
+  border-radius: 0 0 var(--radio) var(--radio);
+}
+
+/* ---------- Encabezado ---------- */
+#header {
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .75rem 1.5rem;
+  padding: .75rem 1.25rem;
+}
+#header #logo { height: auto; display: block; float: none; }
+#header #logo .valign-helper { display: none; }
+#header #logo img {
+  max-height: 4.5rem;
+  max-width: min(24rem, 100%);
+  border-radius: 6px;
+}
+.maits-cuenta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .5rem;
+  font-size: .95rem;
+}
+.maits-cuenta .maits-hola { margin-right: .25rem; }
+.maits-cuenta a {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .4rem .8rem;
+  border-radius: 999px;
+  background: var(--hoja);
+  color: var(--azul);
+  font-weight: 700;
+  text-decoration: none;
+  border: 1px solid var(--borde);
+}
+.maits-cuenta a:hover { background: var(--azul-claro); }
+.maits-cuenta a.maits-entrar { background: var(--azul); color: #fff; border-color: var(--azul); }
+.maits-cuenta a.maits-entrar:hover { background: var(--azul-oscuro); }
+#header .flag { display: inline-block; }
+
+/* ---------- Menu ---------- */
+#nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .4rem;
+  height: auto;
+  margin: 0 1.25rem;
+  padding: .45rem .5rem;
+  background: var(--azul);
+  border: 0;
+  border-radius: var(--radio);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+  white-space: normal;
+}
+#nav li { display: block; }
+#nav li a,
+.rtl #nav li a {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  height: auto;
+  line-height: 1.2;
+  margin: 0;
+  padding: .55rem .95rem;
+  border-radius: 999px;
+  background: none;
+  color: #fff;
+  font-size: 1rem;
+  text-decoration: none;
+}
+/* quitar los iconos de imagen viejos (ahora se usan iconos de letra) */
+#nav li a.home, #nav li a.kb, #nav li a.new, #nav li a.status,
+#nav li a.tickets, #nav li a.agent { background-image: none; }
+#nav li a:hover { background: rgba(255, 255, 255, .15); color: #fff; }
+#nav li a.active { background: #fff; color: var(--azul); font-weight: 700; }
+#nav li a i { font-size: 1.05em; width: 1.1em; text-align: center; }
+
+/* "Crear un ticket" resalta siempre: es la accion principal del sitio */
+#nav li a.new { background: var(--turquesa); color: var(--azul-oscuro); font-weight: 700; }
+#nav li a.new:hover { background: #7fe3e7; }
+#nav li a.new.active { background: #fff; box-shadow: inset 0 0 0 3px var(--turquesa); }
+
+#nav li.maits-nav-agentes { margin-left: auto; }
+#nav li a.agent { font-size: .9rem; opacity: .9; border: 1px solid rgba(255, 255, 255, .45); }
+#nav .maits-contador {
+  min-width: 1.4em;
+  padding: 0 .4em;
+  border-radius: 999px;
+  background: var(--turquesa);
+  color: var(--azul-oscuro);
+  font-size: .8em;
+  font-weight: 700;
+  text-align: center;
+}
+#nav li a.active .maits-contador { background: var(--azul); color: #fff; }
+
+/* ---------- Hoja blanca donde va el contenido ---------- */
+#content {
+  margin: 1.25rem 1.25rem 0;
+  padding: 1.75rem 2rem;
+  min-height: 0;
+  background: var(--hoja);
+  border-radius: var(--radio);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+}
+#content > :first-child { margin-top: 0; }
+
+h1, #content h1 {
+  margin: 0 0 .5rem;
+  color: var(--azul);
+  font-family: var(--letra);
+  font-size: 1.85rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+h2, #content h2 { color: var(--azul); font-size: 1.35rem; line-height: 1.25; margin: 1.5rem 0 .5rem; }
+h3 { font-size: 1.1rem; }
+.maits-ayuda { color: var(--gris); font-size: .95rem; margin: .25rem 0 1rem; }
+a { color: var(--turquesa-texto); }
+#content hr { border-top: 1px solid #dfe3ea; margin: 1.5rem 0; }
+
+/* ---------- Mensajes de aviso ---------- */
+#msg_notice, #msg_warning, #msg_error, #msg_info, .warning-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  margin: 0 0 1.25rem;
+  padding: .85rem 1rem;
+  border: 0;
+  border-left: 5px solid;
+  border-radius: 8px;
+  background-image: none;
+  font-size: 1rem;
+}
+#msg_notice  { color: var(--ok);    background-color: var(--ok-fondo); }
+#msg_warning, .warning-banner { color: var(--aviso); background-color: var(--aviso-fondo); }
+#msg_error   { color: var(--error); background-color: var(--error-fondo); }
+#msg_info    { color: var(--azul);  background-color: var(--azul-claro); }
+#msg_notice::before  { content: "\f058"; font-family: FontAwesome; font-size: 1.2em; }
+#msg_warning::before, .warning-banner::before { content: "\f071"; font-family: FontAwesome; font-size: 1.2em; }
+#msg_error::before   { content: "\f06a"; font-family: FontAwesome; font-size: 1.2em; }
+font.error, .error { color: var(--error); }
+
+/* ---------- Botones ---------- */
+#content input[type="submit"],
+#content input[type="reset"],
+#content input[type="button"],
+#content button,
+#content .action-button,
+.maits-boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  height: auto;
+  min-height: 2.75rem;
+  margin: .25rem;
+  padding: .6rem 1.3rem;
+  border: 2px solid var(--azul);
+  border-radius: 8px;
+  background: var(--hoja);
+  box-shadow: none;
+  color: var(--azul) !important;   /* osTicket los pinta de rojo al editar el formulario */
+  font: 700 1rem/1.2 var(--letra);
+  text-decoration: none;
+  cursor: pointer;
+}
+#content input[type="submit"],
+#content button[type="submit"],
+.maits-boton.principal {
+  background: var(--azul);
+  color: #fff !important;
+}
+#content input[type="submit"]:hover,
+#content button[type="submit"]:hover,
+.maits-boton.principal:hover { background: var(--azul-oscuro); border-color: var(--azul-oscuro); }
+#content input[type="reset"]:hover,
+#content input[type="button"]:hover,
+#content .action-button:hover,
+.maits-boton:hover { background: var(--azul-claro); }
+#content .action-button { min-height: 2.25rem; padding: .35rem .9rem; font-size: .9rem; }
+.maits-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: .25rem; margin: 1.5rem 0 0; }
+.maits-botones.izquierda { justify-content: flex-start; }
+
+/* Enfoque visible con teclado */
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 3px solid var(--turquesa);
+  outline-offset: 2px;
+}
+
+/* ---------- Campos de formulario ---------- */
+#content input[type="text"],
+#content input[type="email"],
+#content input[type="tel"],
+#content input[type="password"],
+#content input[type="number"],
+#content select,
+#content textarea:not(.richtext) {
+  box-sizing: border-box;
+  max-width: 100%;
+  padding: .55rem .75rem;
+  border: 1px solid var(--borde);
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+#content select { min-height: 2.75rem; }
+#content input:focus, #content select:focus, #content textarea:focus {
+  border-color: var(--turquesa-texto);
+  box-shadow: 0 0 0 3px rgba(79, 214, 220, .35);
+  outline: none;
+}
+#content label, #content .form-header b, #content td > label { font-weight: 700; }
+#content table { max-width: 100%; }
+#content .redactor-box { border-radius: 8px; border: 1px solid var(--borde); overflow: hidden; }
+#content .filedrop .dropzone { border-radius: 8px; padding: .75rem; font-size: .95rem; }
+
+/* ---------- Pasos numerados (inicio y formulario de ticket) ---------- */
+.maits-paso-titulo {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin: 1.75rem 0 .35rem;
+  color: var(--azul);
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.maits-num {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--turquesa);
+  color: var(--azul-oscuro);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+/* ---------- Pagina de inicio ---------- */
+#landing_page .main-content { width: auto; float: none; }
+#landing_page .thread-body { padding: 0; background: none; border: 0; font-size: 1rem; font-family: var(--letra); }
+#landing_page .thread-body img { max-width: 100%; height: auto; }
+@media (max-width: 700px) {
+  #landing_page .thread-body img[style*="float"] { float: none !important; display: block; margin: 0 auto 1rem !important; }
+}
+.maits-como {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border-radius: var(--radio);
+  background: var(--azul-claro);
+}
+#content .maits-como h2 { margin: 0 0 1rem; }
+.maits-pasos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.maits-pasos li { display: flex; gap: .75rem; align-items: flex-start; }
+.maits-pasos strong { display: block; color: var(--azul); font-size: 1.1rem; margin-bottom: .2rem; }
+.maits-pasos p { margin: 0; color: var(--tinta); }
+@media (max-width: 760px) { .maits-pasos { grid-template-columns: 1fr; } }
+
+/* ---------- Inicio de sesion (usuarios) ---------- */
+#clientLogin {
+  width: auto;
+  max-width: 34rem;
+  margin: 1.5rem auto 0;
+  padding: 2rem 1.5rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: var(--azul-claro);
+  box-shadow: none;
+  text-align: center;
+}
+.rtl #clientLogin { background: var(--azul-claro); }
+.maits-login-icono { font-size: 2.5rem; color: var(--azul); }
+.maits-login-titulo { margin: .5rem 0 .25rem; font-size: 1.25rem; font-weight: 700; color: var(--azul); }
+#clientLogin .maits-boton.principal { font-size: 1.1rem; padding: .8rem 1.6rem; margin: 1rem 0 .5rem; }
+#clientLogin .maits-ayuda { margin: .5rem auto 0; max-width: 28rem; }
+#clientLogin .maits-ayuda strong { display: inline; font-size: inherit; color: var(--tinta); }
+.maits-pie-login { margin-top: 1.5rem; text-align: center; color: var(--gris); }
+
+/* Botones de inicio externo que no tienen boton propio */
+.external-auth .external-auth-box { border-radius: 8px; background: #fff; }
+
+/* ---------- Formulario "Crear ticket" ---------- */
+#ticketForm > table, #ticketForm table { width: 100%; }
+#ticketForm td { padding: .3rem 0; }
+.maits-datos {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: .3rem 1rem;
+  margin: .5rem 0 0;
+  padding: .85rem 1rem;
+  border-radius: 8px;
+  background: var(--azul-claro);
+}
+.maits-datos dt { font-weight: 700; color: var(--gris); }
+.maits-datos dd { margin: 0; }
+#ticketForm #topicId { width: min(100%, 30rem); font-size: 1.05rem; }
+.maits-espera td {
+  padding: 1rem !important;
+  border: 2px dashed var(--borde);
+  border-radius: 8px;
+  color: var(--gris);
+}
+#dynamic-form .form-header h3 { display: none; } /* el paso 3 ya dice "Describe el problema" */
+#dynamic-form .form-header em,
+#dynamic-form .form-header div { color: var(--gris); }
+#dynamic-form input[type="text"] { width: min(100%, 36rem); }
+#dynamic-form label { display: block; margin-top: .75rem; }
+
+/* ---------- Lista "Mis tickets" ---------- */
+.maits-titulo-fila {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-bottom: 1rem;
+}
+.maits-titulo-fila h1 { margin: 0; }
+.maits-pestanas { display: flex; gap: .4rem; flex-wrap: wrap; }
+.maits-pestanas a {
+  padding: .45rem 1rem;
+  border-radius: 999px;
+  border: 1px solid var(--borde);
+  color: var(--azul);
+  font-weight: 700;
+  text-decoration: none;
+}
+.maits-pestanas a.active { background: var(--azul); border-color: var(--azul); color: #fff; }
+.search.well {
+  display: block;
+  margin: 0 0 1rem;
+  padding: .85rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--azul-claro);
+}
+#ticketSearchForm { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+#ticketSearchForm input[type="text"] { flex: 1 1 14rem; }
+#ticketSearchForm .pull-right { float: none; margin-left: auto; display: flex; align-items: center; gap: .4rem; }
+#ticketSearchForm input[type="submit"] { margin: 0; }
+.maits-tabla { overflow-x: auto; }
+#ticketTable {
+  width: 100%;
+  border: 1px solid var(--borde);
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+}
+#ticketTable caption { padding: 0 0 .5rem; background: none; text-align: left; color: var(--gris); font-weight: 400; }
+#ticketTable th {
+  padding: .7rem .75rem;
+  border: 0;
+  background: var(--azul);
+  color: #fff;
+  text-align: left;
+  white-space: nowrap;
+}
+#ticketTable th a { color: #fff; text-decoration: none; }
+#ticketTable td {
+  padding: .7rem .75rem;
+  border: 0;
+  border-top: 1px solid #e3e7ee;
+  background: #fff;
+  vertical-align: middle;
+}
+#ticketTable tbody tr.link { display: table-row; } /* toda la fila abre el ticket */
+#ticketTable tbody tr:hover td { background: #f3f6fb; cursor: pointer; }
+#ticketTable td a.Icon { padding-left: 0; background: none; font-weight: 700; }
+#ticketTable .truncate { max-width: none !important; max-height: none !important; white-space: normal; display: inline; }
+#ticketTable td:nth-child(1), #ticketTable td:nth-child(2) { white-space: nowrap; }
+.maits-vacio { padding: 2rem 1rem !important; text-align: center; color: var(--gris); }
+
+/* Etiqueta de estado (Abierto / Cerrado) */
+.maits-estado {
+  display: inline-block;
+  padding: .15rem .65rem;
+  border-radius: 999px;
+  font-size: .85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.maits-estado.open   { background: var(--ok-fondo); color: var(--ok); }
+.maits-estado.closed { background: #e8eaee; color: #444c5a; }
+.maits-estado.respondido { background: var(--aviso-fondo); color: var(--aviso); }
+
+/* ---------- Ver un ticket ---------- */
+#ticketInfo { width: 100%; }
+#ticketInfo h1 { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .75rem; }
+#ticketInfo h1 small { color: var(--gris); font-size: 1.1rem; font-weight: 400; }
+#ticketInfo h1 .pull-right { margin-left: auto; float: none; }
+#ticketInfo h1 .refresh { color: var(--turquesa-texto); }
+#ticketInfo > tbody > tr > td { padding: 0 .4rem .75rem; }
+.infoTable { border: 1px solid var(--borde); border-radius: 8px; border-collapse: separate; overflow: hidden; }
+.infoTable .headline, .custom-data .headline { padding: .55rem .75rem; background: var(--azul-claro); color: var(--azul); font-weight: 700; }
+.infoTable th, .infoTable td { padding: .4rem .75rem; background: #fff; font-size: .95rem; }
+.infoTable th { color: var(--gris); text-align: left; }
+@media (max-width: 700px) {
+  #ticketInfo > tbody > tr > td { display: block; width: auto; }
+}
+#reply { margin-top: 1rem; padding: 1.25rem; border: 1px solid var(--borde); border-radius: var(--radio); background: #fbfcfe; }
+#reply h2 { margin-top: 0; }
+
+/* Conversacion */
+.thread-entry .header { font-size: .95rem; }
+/* thread.css fija 14px con !important; aqui se ajusta al tamano de la pantalla */
+.thread-body div, .thread-body p, .thread-body ul, .thread-body ol,
+.thread-body table, .thread-body dl, .thread-body blockquote { font-size: inherit; }
+.thread-body { font-size: 1rem !important; line-height: 1.55; font-family: var(--letra); color: var(--tinta); }
+#ticketThread .thread-entry.avatar { margin-left: 3.5rem; }
+
+/* ---------- Ventana "Espere, por favor" siempre centrada ---------- */
+#loading {
+  position: fixed;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%);
+  width: min(22rem, calc(100% - 2rem));
+  border-radius: var(--radio);
+  font-size: 1rem;
+}
+
+/* ---------- Pie de pagina ---------- */
+#footer { font-size: .85rem; padding-bottom: 1rem; }
+#footer p { margin-top: 1rem; }
+
+/* ---------- Celular ---------- */
+@media (max-width: 600px) {
+  #container { width: calc(100% - 1rem); }
+  #header { justify-content: center; text-align: center; }
+  #nav { margin: 0 .5rem; }
+  #nav li.maits-nav-agentes { margin-left: 0; }
+  #content { margin: 1rem .5rem 0; padding: 1.25rem 1rem; }
+  h1, #content h1 { font-size: 1.5rem; }
+  .maits-datos { grid-template-columns: 1fr; }
+
+  /* Buscador en una columna */
+  #ticketSearchForm .pull-right { margin-left: 0; width: 100%; }
+  #ticketSearchForm .pull-right select { flex: 1; min-width: 0; }
+
+  /* Lista de tickets como tarjetas: numero y estado arriba, asunto, fecha y area abajo */
+  .maits-tabla { overflow: visible; }
+  #ticketTable, #ticketTable tbody { display: block; }
+  #ticketTable thead { display: none; }
+  #ticketTable caption { display: block; padding: .6rem .75rem; border-bottom: 1px solid #e3e7ee; }
+  #ticketTable tbody tr.link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "num estado" "asunto asunto" "fecha area";
+    gap: .25rem .75rem;
+    padding: .75rem;
+    border-top: 1px solid #e3e7ee;
+  }
+  #ticketTable tbody tr.link:first-child { border-top: 0; }
+  #ticketTable tbody tr.link td { display: block; padding: 0; border: 0; background: none; }
+  #ticketTable td:nth-child(1) { grid-area: num; }
+  #ticketTable td:nth-child(2) { grid-area: fecha; color: var(--gris); font-size: .9rem; }
+  #ticketTable td:nth-child(3) { grid-area: estado; text-align: right; }
+  #ticketTable td:nth-child(4) { grid-area: asunto; font-size: 1.05rem; }
+  #ticketTable td:nth-child(5) { grid-area: area; color: var(--gris); font-size: .9rem; text-align: right; }
+  #ticketTable td:nth-child(5) a, #ticketTable td:nth-child(5) span { color: inherit; }
+}
+
+/* ---------- theme.css subraya con puntos todos los enlaces al pasar el mouse;
+   en botones y pestanas se respeta su propio borde ---------- */
+#nav li a:hover { border-bottom: 0; margin-bottom: 0; }
+#nav li a.agent:hover { border-bottom: 1px solid rgba(255, 255, 255, .45); }
+.maits-cuenta a:hover,
+.maits-pestanas a:hover { border-bottom: 1px solid var(--borde); margin-bottom: 0; }
+.maits-pestanas a.active:hover { border-bottom-color: var(--azul); }
+a.maits-boton:hover,
+#content a.action-button:hover { border: 2px solid var(--azul); margin: .25rem; }

@@ -1,6 +1,5 @@
-@media (min-width: 1800px){
-  body{ zoom: 1.25; }
-}
+/* El tamano adaptable a pantallas grandes ahora esta en maits.css.
+   (Se quito "zoom: 1.25" porque descuadraba las ventanas emergentes.) */
 html {
   font-size: 100%;
   overflow-y: scroll;

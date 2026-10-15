@@ -1,0 +1,195 @@
+/* =====================================================================
+   M.A.I.T.S - Acceso de agentes (scp/login.php)
+   Se carga despues de login.css. El fondo (imagen subida en el panel
+   de administracion) no se toca; solo el recuadro y su contenido.
+   El recuadro crece segun el tamano de la pantalla.
+   ===================================================================== */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../../assets/default/fonts/atkinson/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../../assets/default/fonts/atkinson/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+:root {
+  --azul: #1f3a6e;
+  --azul-oscuro: #142a52;
+  --turquesa: #4fd6dc;
+  --tinta: #1b2433;
+  --error: #a32020;
+  --letra: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+}
+
+/* Tamano base segun la pantalla (igual que en el portal de usuarios) */
+html { font-size: 100%; }
+@media (min-width: 1600px) { html { font-size: 112.5%; } }
+@media (min-width: 2200px) { html { font-size: 125%; } }
+
+body, input, button { font-family: var(--letra); color: var(--tinta); }
+body {
+  min-height: 100vh;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem 6rem;
+  box-sizing: border-box;
+  font-size: 1rem;
+}
+#brickwall { position: fixed; }
+
+/* ---------- Recuadro ---------- */
+#loginBox {
+  position: relative;
+  left: auto;
+  top: auto;
+  margin: 0;
+  width: min(30rem, 100%);
+  padding: 2rem 2.25rem 1.75rem;
+  border-radius: 14px;
+}
+@media (min-width: 1600px) { #loginBox { width: min(32rem, 100%); } }
+@media (min-width: 2200px) { #loginBox { width: min(36rem, 100%); } #logo a img { max-height: 7rem; } }
+#loginBox:after {
+  border-radius: 14px;
+  background-color: rgba(235, 238, 245, .82); /* mas claro: el texto se lee mejor */
+}
+#blur, #background { border-radius: 14px; }
+
+#logo a { height: auto; }
+#logo a img { max-width: 100%; max-height: 6rem; border-radius: 6px; }
+#logo .valign-helper { display: none; }
+
+.maits-titulo {
+  margin: 1.25rem 0 .25rem;
+  color: var(--azul);
+  font-size: 1.6rem;
+  line-height: 1.2;
+}
+.maits-sub { margin: 0 0 1rem; color: #3d4659; font-size: 1rem; }
+
+h3#login-message {
+  margin: 0 0 1rem;
+  padding: .6rem .8rem;
+  border-radius: 8px;
+  background: #fde8e8;
+  color: var(--error);
+  font-size: .95rem;
+  font-weight: 700;
+}
+h3#login-message:empty { display: none; }
+div.banner { color: #3d4659; }
+
+/* ---------- Formulario ---------- */
+form { width: 100%; }
+fieldset { margin: 0; }
+fieldset input,
+input[type=text],
+input[type=password] {
+  width: 100%;
+  margin: 0 0 .85rem;
+  padding: .75rem .9rem;
+  border: 1px solid #9aa3b2;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 1rem;
+}
+input:focus {
+  border-color: var(--azul);
+  box-shadow: 0 0 0 3px rgba(79, 214, 220, .55);
+}
+:-webkit-input-placeholder, ::placeholder { color: #6b7385; font-style: normal; }
+
+#reset-link { font-size: .9rem; color: var(--azul); }
+fieldset h3 { display: block !important; text-align: left; margin: 0 0 .75rem; }
+
+button[type=submit],
+.button.submit {
+  float: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .5rem;
+  width: 100%;
+  height: auto;
+  min-height: 3rem;
+  padding: .7rem 1rem;
+  border-radius: 8px;
+  background: var(--azul);
+  box-shadow: none;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+button[type=submit]:hover {
+  background: var(--azul-oscuro);
+  box-shadow: none;
+}
+.pull-right { float: none; }
+
+/* "o bien" entre el formulario y el correo institucional */
+.or {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin: 1.25rem 0;
+  color: #4a5366;
+  font-size: .9rem;
+}
+.or::before, .or::after { content: ""; flex: 1; border-top: 1px solid rgba(0, 0, 0, .25); }
+.or hr { display: none; }
+
+.maits-externo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+  min-height: 3rem;
+  padding: .7rem 1rem;
+  border: 2px solid var(--azul);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--azul);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+.maits-externo:hover { background: #e9eef7; }
+.external-auth-box { background: #fff; border-radius: 8px; }
+
+/* ---------- Boton "Regresar" ---------- */
+.maits-regresar {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: 1.5rem;
+  padding: .55rem 1rem;
+  border-radius: 999px;
+  background: rgba(31, 58, 110, .1);
+  color: var(--azul);
+  font-weight: 700;
+  font-size: .95rem;
+  text-decoration: none;
+}
+.maits-regresar:hover { background: rgba(31, 58, 110, .2); }
+
+a:focus-visible, button:focus-visible, input:focus-visible {
+  outline: 3px solid var(--turquesa);
+  outline-offset: 2px;
+}
+
+/* ---------- Pie ---------- */
+#company { width: 100%; left: 0; margin-left: 0; bottom: -3rem; font-size: .9rem; }
+#poweredBy { font-size: .85rem; }
+
+/* ---------- Celular ---------- */
+@media (max-width: 480px) {
+  body { padding: 1rem .75rem 5rem; align-items: flex-start; }
+  #loginBox { padding: 1.5rem 1.25rem; }
+  .maits-titulo { font-size: 1.4rem; }
+}
