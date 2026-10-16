@@ -1,0 +1,404 @@
+/* =====================================================================
+   M.A.I.T.S - Estilo del panel de agentes y de administracion (scp/)
+   ---------------------------------------------------------------------
+   Se carga despues de scp.css. El fondo del edificio (definido en
+   scp.css) NO se toca.
+
+   Identidad propia, distinta al portal de usuarios:
+     - Portal de usuarios: azul + turquesa, botones redondos.
+     - Panel de agentes:   morado noche (el cielo del fondo) + ambar
+                           (las ventanas iluminadas), pestanas tipo carpeta.
+     - Administracion:     misma base, con etiqueta roja de "cuidado".
+   ===================================================================== */
+
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../../assets/default/fonts/atkinson/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2");
+  font-weight: 400; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../../assets/default/fonts/atkinson/atkinson-hyperlegible-latin-400-italic.woff2") format("woff2");
+  font-weight: 400; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Hyperlegible";
+  src: url("../../assets/default/fonts/atkinson/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2");
+  font-weight: 700; font-style: normal; font-display: swap;
+}
+
+:root {
+  --noche: #241a43;         /* barra superior */
+  --noche-2: #362a63;
+  --violeta: #4b3b8f;       /* botones principales */
+  --violeta-claro: #efebfa;
+  --ambar: #f2a93b;         /* acento: pestana activa, avisos */
+  --ambar-oscuro: #8a5a00;  /* texto ambar sobre fondo claro */
+  --ambar-suave: #fff4df;
+  --rojo-admin: #c0504d;
+  --tinta: #1f1b2d;
+  --gris: #5b5670;
+  --borde: #d9d4e6;
+  --hoja: #ffffff;
+  --radio: 10px;
+  --letra: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+}
+
+/* ---------- Tamano segun la pantalla (sin zoom) ---------- */
+html { font-size: 100%; }
+@media (min-width: 1600px) { html { font-size: 106.25%; } }
+@media (min-width: 2200px) { html { font-size: 118.75%; } }
+body {
+  font-family: var(--letra);
+  font-size: .9375rem;
+  letter-spacing: 0;
+  color: var(--tinta);
+}
+body, input, select, textarea, button { font-family: var(--letra); }
+
+/* ---------- Recuadro principal ---------- */
+#container {
+  width: min(82rem, calc(100% - 2rem));
+  margin: 1rem auto 1.5rem;
+  border-radius: var(--radio);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, .45);
+}
+
+/* ---------- Encabezado oscuro ---------- */
+#header {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .6rem 1rem;
+  height: auto;
+  padding: .7rem 1.25rem;
+  border: 0;
+  border-radius: var(--radio) var(--radio) 0 0;
+  background: var(--noche);
+  box-shadow: none;
+}
+#header #logo { height: auto; max-width: none; padding: 0; float: none; }
+#header #logo .valign-helper { display: none; }
+#header #logo img { max-height: 3.4rem; max-width: 17rem; border-radius: 6px; display: block; }
+
+.maits-modo {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .4rem .8rem;
+  border-radius: 6px;
+  background: var(--ambar);
+  color: var(--noche);
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+  cursor: help;
+}
+.maits-modo.admin { background: var(--rojo-admin); color: #fff; }
+
+#header p#info {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: .4rem;
+  max-width: none;
+  margin: 0 0 0 auto;
+  padding: 0;
+  float: none;
+  border: 0;
+  background: none;
+  color: #e7e2f7;
+  text-align: right;
+}
+#header p#info .maits-hola { margin-right: .35rem; }
+#header p#info strong { color: #fff; }
+#header p#info a {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .35rem .7rem;
+  border: 1px solid rgba(255, 255, 255, .28);
+  border-radius: 6px;
+  color: #fff;
+  font-size: .9rem;
+  text-decoration: none;
+}
+#header p#info a:hover { background: rgba(255, 255, 255, .12); }
+#header p#info a.maits-salir { border-color: rgba(242, 169, 59, .7); color: var(--ambar); }
+
+/* ---------- Menu principal: pestanas tipo carpeta ---------- */
+#nav {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: .25rem;
+  height: auto;
+  margin: 0;
+  padding: .2rem 1rem 0;
+  line-height: 1.2;
+  border: 0;
+  background: var(--noche);
+  white-space: normal;
+}
+#nav > li + li { margin-left: 0; }
+#nav .active, #nav .inactive {
+  display: block;
+  min-width: 0;
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 8px 8px 0 0;
+  box-shadow: none;
+  text-align: left;
+}
+#nav li.active, #nav li.inactive:hover { box-shadow: none; }
+#nav > li > a {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .7rem 1.05rem .65rem;
+  color: #d9d3f0;
+  font-size: 1rem;
+  text-decoration: none;
+  border-top: 3px solid transparent;
+  border-radius: 8px 8px 0 0;
+}
+#nav > li > a i { font-size: 1.05em; width: 1.1em; text-align: center; opacity: .9; }
+#nav li.inactive > a { color: #ddd7f2; }
+#nav li.inactive:hover { background: var(--noche-2); }
+#nav li.inactive:hover > a { color: #fff; text-decoration: none; }
+#nav li.active { background: #f6f4fb; }
+#nav li.active > a {
+  color: var(--noche);
+  font-weight: 700;
+  border-top-color: var(--ambar);
+}
+
+/* Menus que se despliegan al pasar el mouse */
+#nav li.inactive > ul {
+  top: 100%;
+  left: 0;
+  width: 15rem;
+  padding: .35rem 0;
+  border: 1px solid var(--borde);
+  border-radius: 0 8px 8px 8px;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .25);
+}
+#nav .inactive li a {
+  display: block;
+  padding: .5rem .9rem .5rem 2.3rem;
+  color: var(--tinta);
+  font-size: .95rem;
+  background-position: .8rem 50%;
+}
+#nav .inactive li a:hover { color: var(--violeta); background-color: var(--violeta-claro); text-decoration: none; }
+
+/* ---------- Submenu (Abiertos, Mis Solicitudes, Cerrado, Buscar...) ---------- */
+/* La barra ocupa todo el ancho (antes media 960px fijos) */
+.jb-overflowmenu { width: auto; height: 2.6rem; }
+.jb-overflowmenu .jb-overflowmenu-menu-primary { height: 2.4rem !important; margin-top: .1rem; }
+nav#customQ_nav { padding: 0; border-bottom: 1px solid var(--borde); background: #f6f4fb; }
+nav#customQ_nav #sub_nav { border-bottom: 0; }
+#sub_nav {
+  height: auto;
+  margin: 0;
+  padding: .35rem 1rem;
+  line-height: 1.9;
+  border: 0;
+  border-bottom: 1px solid var(--borde);
+  background: #f6f4fb;
+}
+#sub_nav > li > a,
+#customQ_nav .jb-overflowmenu-menu-primary li.item > a {
+  color: var(--tinta);
+  font-size: .975rem;
+}
+#sub_nav a.active, #sub_nav li.active > a,
+#customQ_nav .jb-overflowmenu-menu-primary li.item.active > a,
+#customQ_nav .jb-overflowmenu-menu-primary li.item > a.active {
+  font-weight: 700;
+  color: var(--noche);
+  box-shadow: inset 0 -3px 0 var(--ambar);
+}
+#customQ_nav .jb-overflowmenu-menu-primary li.item:hover {
+  border-color: var(--borde);
+  border-radius: 6px 6px 0 0;
+}
+#sub_nav > li > a:hover,
+#customQ_nav .jb-overflowmenu-menu-primary li.item:hover > a { color: var(--violeta); }
+/* "Nuevo Ticket" / "Nueva tarea" destacados como boton */
+#customQ_nav a.newTicket, #sub_nav a.newTicket, #sub_nav a.newTask, #sub_nav a.new {
+  padding: .1rem .8rem .1rem 1.9rem !important;
+  border-radius: 6px;
+  background-color: var(--ambar);
+  background-position: .55rem 50%;
+  color: var(--noche) !important;
+  font-weight: 700;
+}
+#customQ_nav a.newTicket:hover, #sub_nav a.newTicket:hover, #sub_nav a.newTask:hover { background-color: #f6bc63; }
+
+/* ---------- Ayuda de cada seccion ---------- */
+/* Va sobre fondo blanco, pegada al contenido */
+.maits-ayuda { margin: 0; padding: .9rem 1rem 0; background: var(--hoja); }
+.maits-ayuda-cuerpo {
+  display: flex;
+  align-items: flex-start;
+  gap: .8rem;
+  padding: .8rem 1rem;
+  border: 1px solid #f1d7a8;
+  border-left: 5px solid var(--ambar);
+  border-radius: 8px;
+  background: var(--ambar-suave);
+}
+.maits-ayuda-icono { color: var(--ambar-oscuro); font-size: 1.4rem; margin-top: .1rem; }
+.maits-ayuda-titulo { display: block; margin-bottom: .2rem; color: var(--noche); font-size: 1.02rem; }
+.maits-ayuda ul { margin: 0; padding-left: 1.1rem; }
+.maits-ayuda li { margin: .15rem 0; line-height: 1.45; }
+.maits-ayuda-cuerpo > div { flex: 1; }
+.maits-ayuda-cerrar, .maits-ayuda-abrir {
+  flex: none;
+  padding: .35rem .75rem;
+  border: 1px solid #e3c48d;
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ambar-oscuro);
+  font: 700 .85rem var(--letra);
+  cursor: pointer;
+}
+.maits-ayuda-cerrar:hover, .maits-ayuda-abrir:hover { background: #fff9ee; }
+.maits-ayuda-abrir { display: none; margin-left: auto; }
+.maits-ayuda.oculta { display: flex; justify-content: flex-end; padding-top: .6rem; }
+.maits-ayuda.oculta .maits-ayuda-cuerpo { display: none; }
+.maits-ayuda.oculta .maits-ayuda-abrir { display: inline-flex; gap: .35rem; align-items: center; }
+
+/* ---------- Hoja de contenido ---------- */
+#content {
+  padding: 1rem 1rem 1.5rem;
+  border: 0;
+  border-radius: 0 0 var(--radio) var(--radio);
+  background: var(--hoja);
+}
+h2 { color: var(--noche); font-size: 1.45rem; }
+h2 a, h2 a:hover { color: var(--noche); }
+h2 i { color: var(--violeta); font-size: .8em; top: 0; }
+a { color: #3d3190; }
+
+/* Mensajes */
+#msg_notice, #msg_warning, #msg_error, #msg_info { border-radius: 8px; font-size: .95rem; }
+
+/* ---------- Tablas (lista de tickets, usuarios, tareas) ---------- */
+/* Las tablas tenian 940px fijos; ahora usan todo el ancho disponible */
+#content table[width="940"], #content table.list, #content table[width="100%"] { width: 100%; }
+table.list { border-radius: 8px; overflow: hidden; border-color: var(--borde); }
+table.list thead th { padding: .55rem .5rem; background: #ece8f6; border-color: var(--borde); }
+table.list thead th a { color: var(--noche); }
+table.list tbody td { padding: .55rem .5rem; vertical-align: middle; border-color: #ebe8f3; }
+table.list tbody tr:nth-child(2n+1) td { background-color: #faf9fd; }
+table.list tbody tr:hover td,
+table.list tbody tr:nth-child(2n+1):hover td,
+table.list tbody tr.highlight td { background: var(--ambar-suave); }
+table.list tfoot td { padding: .5rem; background: #f6f4fb; }
+
+/* ---------- Botones ---------- */
+.action-button, .button, input[type=button], input[type=reset], input[type=submit], button {
+  border-radius: 6px;
+}
+.action-button.maits-con-texto { padding-left: .7rem; padding-right: .7rem; }
+/* la flechita del menu va al final, despues del texto */
+.action-button.maits-con-texto > .icon-caret-down { order: 3; float: none; margin: 0 0 0 .3rem; }
+.action-button.maits-con-texto > span, .action-button.maits-con-texto > a { order: 1; display: inline-flex; align-items: center; gap: .35rem; }
+.action-button.maits-con-texto > a,
+.action-button.maits-con-texto { display: inline-flex; align-items: center; gap: .35rem; }
+.action-button .maits-etq { font-size: .85rem; font-weight: 700; color: var(--tinta); }
+.action-button.red .maits-etq, .action-button#tickets-delete .maits-etq { color: #b42318; }
+
+button[type=submit], input[type="submit"], .primary.button {
+  background-color: var(--violeta);
+  box-shadow: none;
+  color: #fff;
+  font-weight: 700;
+}
+button[type=submit]:hover, input[type=submit]:hover, input[type=submit]:active {
+  background-color: var(--noche);
+  box-shadow: none;
+}
+/* "Guardar y enviar" con cambios sin guardar */
+.save.pending {
+  background-color: var(--ambar);
+  box-shadow: none;
+  color: var(--noche);
+}
+.save.pending:hover { background-color: #f6bc63; color: var(--noche); box-shadow: none; }
+
+/* Campos */
+input[type=text], input[type=password], input[type=email], input[type=search], select, textarea {
+  border-radius: 6px;
+}
+input:focus, select:focus, textarea:focus { outline: 2px solid var(--ambar); outline-offset: 1px; }
+a:focus-visible, button:focus-visible { outline: 3px solid var(--ambar); outline-offset: 2px; }
+
+/* ---------- Vista de un ticket ---------- */
+.tixTitle h3 { color: var(--noche); font-size: 1.5rem; font-weight: 700; margin-top: .5rem; }
+table.ticket_info { width: 100%; }
+#response_options ul.tabs li a { display: inline-flex; align-items: center; gap: .4rem; font-size: 1rem; }
+#response_options ul.tabs li.active { border-top: 3px solid var(--ambar); }
+.maits-aviso-form {
+  display: flex;
+  align-items: flex-start;
+  gap: .6rem;
+  margin: .5rem .3rem .75rem;
+  padding: .65rem .85rem;
+  border-radius: 8px;
+  font-size: .95rem;
+  line-height: 1.45;
+}
+.maits-aviso-form i { font-size: 1.15rem; margin-top: .1rem; }
+.maits-aviso-form.respuesta { background: var(--violeta-claro); color: var(--noche); }
+.maits-aviso-form.respuesta i { color: var(--violeta); }
+.maits-aviso-form.nota { background: var(--ambar-suave); color: #4a3200; }
+.maits-aviso-form.nota i { color: var(--ambar-oscuro); }
+
+/* Barra que se queda fija arriba al bajar en la pagina */
+.sticky.bar.fixed { border-bottom: 3px solid var(--ambar); }
+
+/* ---------- Pie de pagina (legible sobre el fondo) ---------- */
+#footer {
+  width: fit-content;
+  margin: 0 auto;
+  padding: .35rem .9rem;
+  border-radius: 999px;
+  background: rgba(20, 14, 40, .65);
+  color: #f1edff;
+  font-size: .85rem;
+}
+#footer a { color: #fff; }
+
+/* ---------- Pantallas chicas ---------- */
+@media (max-width: 760px) {
+  #container { width: calc(100% - .5rem); margin-top: .25rem; }
+  #header { padding: .6rem .75rem; }
+  #header p#info { margin-left: 0; width: 100%; justify-content: flex-start; }
+  #nav { overflow-x: auto; flex-wrap: nowrap; padding: .2rem .5rem 0; }
+  #nav > li { flex: none; }
+  #content { overflow-x: auto; }
+  #nav > li > a { padding: .6rem .75rem; white-space: nowrap; }
+  #nav li.inactive > ul { display: none; }
+  .action-button .maits-etq { display: none; }
+  .maits-ayuda-cuerpo { flex-wrap: wrap; }
+}
+
+/* ---------- Conversacion del ticket: que tipo de mensaje es cada uno ---------- */
+#ticketThread .thread-entry .header > .pull-right::before,
+.thread-body + .thread-entry .header > .pull-right::before {
+  display: inline-block;
+  margin: 0 .5rem 0 0;
+  padding: .05rem .55rem;
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 700;
+  vertical-align: middle;
+}
+.thread-entry.message .header > .pull-right::before  { content: "Mensaje del usuario"; background: #dbe7ff; color: #1d3f8a; }
+.thread-entry.response .header > .pull-right::before { content: "Respuesta enviada al usuario"; background: #ffe2c2; color: #7a3d00; }
+.thread-entry.note .header > .pull-right::before     { content: "Nota interna (solo agentes)"; background: #fff2b3; color: #5c4700; }

@@ -50,6 +50,9 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/select2.min.css?8d38b06"/>
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css?8d38b06"/>
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH ?>scp/css/translatable.css?8d38b06"/>
+    <!-- [M.A.I.T.S] Estilo propio del panel de agentes (va despues de scp.css) -->
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH ?>scp/css/maits-agentes.css?v=1"/>
+    <script type="text/javascript" src="<?php echo ROOT_PATH ?>scp/js/maits-agentes.js?v=1"></script>
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-16x16.png" sizes="16x16" />
@@ -60,7 +63,7 @@ if (osTicket::is_ie())
     }
     ?>
 </head>
-<body>
+<body class="<?php echo (isset($nav) && $nav && $nav->isAdminPanel()) ? 'maits-admin' : 'maits-agente'; ?>">
 <div id="container">
     <?php
     if($ost->getError())
@@ -71,20 +74,30 @@ if (osTicket::is_ie())
         echo sprintf('<div id="notice_bar">%s</div>', $ost->getNotice());
     ?>
     <div id="header">
-        <p id="info" class="pull-right no-pjax"><?php echo sprintf(__('Welcome, %s.'), '<strong>'.$thisstaff->getFirstName().'</strong>'); ?>
-           <?php
-            if($thisstaff->isAdmin() && !defined('ADMINPAGE')) { ?>
-            | <a href="<?php echo ROOT_PATH ?>scp/admin.php" class="no-pjax"><?php echo __('Admin Panel'); ?></a>
-            <?php }else{ ?>
-            | <a href="<?php echo ROOT_PATH ?>scp/index.php" class="no-pjax"><?php echo __('Agent Panel'); ?></a>
-            <?php } ?>
-            | <a href="<?php echo ROOT_PATH ?>scp/profile.php"><?php echo __('Profile'); ?></a>
-            | <a href="<?php echo ROOT_PATH ?>scp/logout.php?auth=<?php echo $ost->getLinkToken(); ?>" class="no-pjax"><?php echo __('Log Out'); ?></a>
-        </p>
-        <a href="<?php echo ROOT_PATH ?>scp/index.php" class="no-pjax" id="logo">
+        <?php // [M.A.I.T.S] Encabezado: logo, en que panel estas y tu cuenta
+        $maits_admin = isset($nav) && $nav && $nav->isAdminPanel(); ?>
+        <a href="<?php echo ROOT_PATH ?>scp/index.php" class="no-pjax" id="logo" title="Ir a los tickets">
             <span class="valign-helper"></span>
             <img src="<?php echo ROOT_PATH ?>scp/logo.php?<?php echo strtotime($cfg->lastModified('staff_logo_id')); ?>" alt="osTicket &mdash; <?php echo __('Customer Support System'); ?>"/>
         </a>
+        <div class="maits-modo <?php echo $maits_admin ? 'admin' : ''; ?>"
+            title="<?php echo $maits_admin
+                ? 'Aquí se configura el sistema. Los cambios afectan a todos.'
+                : 'Estás en la sección del personal que atiende los tickets.'; ?>">
+            <i class="<?php echo $maits_admin ? 'icon-cogs' : 'icon-briefcase'; ?>"></i>
+            <?php echo $maits_admin ? 'Panel de administración' : 'Panel de agentes'; ?>
+        </div>
+        <p id="info" class="no-pjax">
+            <span class="maits-hola">Hola, <strong><?php echo Format::htmlchars($thisstaff->getFirstName()); ?></strong></span>
+           <?php
+            if($thisstaff->isAdmin() && !defined('ADMINPAGE')) { ?>
+            <a href="<?php echo ROOT_PATH ?>scp/admin.php" class="no-pjax" title="Configuración del sistema (solo administradores)"><i class="icon-cogs"></i> Administración</a>
+            <?php }else{ ?>
+            <a href="<?php echo ROOT_PATH ?>scp/index.php" class="no-pjax" title="Volver a los tickets"><i class="icon-briefcase"></i> Panel de agentes</a>
+            <?php } ?>
+            <a href="<?php echo ROOT_PATH ?>scp/profile.php"><i class="icon-user"></i> Mi perfil</a>
+            <a href="<?php echo ROOT_PATH ?>scp/logout.php?auth=<?php echo $ost->getLinkToken(); ?>" class="no-pjax maits-salir"><i class="icon-signout"></i> Salir</a>
+        </p>
     </div>
     <div id="pjax-container" class="<?php if ($_POST) echo 'no-pjax'; ?>">
 <?php } else {
@@ -104,6 +117,7 @@ if (osTicket::is_ie())
 <?php include STAFFINC_DIR . "templates/navigation.tmpl.php"; ?>
     </ul>
     <?php include STAFFINC_DIR . "templates/sub-navigation.tmpl.php"; ?>
+    <?php include STAFFINC_DIR . "templates/maits-ayuda.tmpl.php"; // [M.A.I.T.S] ayuda de cada seccion ?>
 
         <div id="content">
         <?php if(isset($errors['err'])) { ?>
