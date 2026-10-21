@@ -2,8 +2,15 @@
 header("Content-Type: text/html; charset=UTF-8");
 header("Content-Security-Policy: frame-ancestors ".$cfg->getAllowIframes()."; script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'none'");
 
-$title = ($ost && ($title=$ost->getPageTitle()))
-    ? $title : ('osTicket :: '.__('Staff Control Panel'));
+// [M.A.I.T.S] Titulo de la pestana del navegador: "<titulo del sitio>:: Agentes"
+// (o ":: Administración"). El titulo del sitio sale de Administración ->
+// Configuración -> "Nombre/título de Helpdesk"; en la copia de pruebas
+// dice "M.A.I.T.S (PRUEBAS)". En un ticket o tarea se agrega su número.
+$maits_sitio = ($cfg && $cfg->getTitle()) ? $cfg->getTitle() : 'M.A.I.T.S';
+$maits_seccion = (isset($nav) && $nav && $nav->isAdminPanel()) ? 'Administración' : 'Agentes';
+$maits_pagina = $ost ? $ost->getPageTitle() : '';
+$title = $maits_sitio.':: '.$maits_seccion
+    .(($maits_pagina && stripos($maits_pagina, 'osTicket') === false) ? ' - '.$maits_pagina : '');
 
 if (!isset($_SERVER['HTTP_X_PJAX'])) { ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
@@ -51,8 +58,8 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css?8d38b06"/>
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH ?>scp/css/translatable.css?8d38b06"/>
     <!-- [M.A.I.T.S] Estilo propio del panel de agentes (va despues de scp.css) -->
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH ?>scp/css/maits-agentes.css?v=1"/>
-    <script type="text/javascript" src="<?php echo ROOT_PATH ?>scp/js/maits-agentes.js?v=1"></script>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH ?>scp/css/maits-agentes.css?v=2"/>
+    <script type="text/javascript" src="<?php echo ROOT_PATH ?>scp/js/maits-agentes.js?v=3"></script>
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-32x32.png" sizes="32x32" />
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-16x16.png" sizes="16x16" />
@@ -90,9 +97,10 @@ if (osTicket::is_ie())
         <p id="info" class="no-pjax">
             <span class="maits-hola">Hola, <strong><?php echo Format::htmlchars($thisstaff->getFirstName()); ?></strong></span>
            <?php
+            // Solo los administradores ven el boton para cambiar de panel
             if($thisstaff->isAdmin() && !defined('ADMINPAGE')) { ?>
             <a href="<?php echo ROOT_PATH ?>scp/admin.php" class="no-pjax" title="Configuración del sistema (solo administradores)"><i class="icon-cogs"></i> Administración</a>
-            <?php }else{ ?>
+            <?php } elseif (defined('ADMINPAGE')) { ?>
             <a href="<?php echo ROOT_PATH ?>scp/index.php" class="no-pjax" title="Volver a los tickets"><i class="icon-briefcase"></i> Panel de agentes</a>
             <?php } ?>
             <a href="<?php echo ROOT_PATH ?>scp/profile.php"><i class="icon-user"></i> Mi perfil</a>
@@ -111,7 +119,7 @@ if (osTicket::is_ie())
         if (strpos($h, '<script ') !== false)
             echo $h;
     } ?>
-    <title><?php echo ($ost && ($title=$ost->getPageTitle()))?$title:'osTicket :: '.__('Staff Control Panel'); ?></title><?php
+    <title><?php echo Format::htmlchars($title); ?></title><?php
 } # endif X_PJAX ?>
     <ul id="nav">
 <?php include STAFFINC_DIR . "templates/navigation.tmpl.php"; ?>

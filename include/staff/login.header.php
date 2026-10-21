@@ -7,7 +7,7 @@ header("Content-Security-Policy: frame-ancestors ".$cfg->getAllowIframes()."; sc
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta http-equiv="refresh" content="7200" />
-    <title><?php echo Format::htmlchars($cfg->getTitle() ?: 'osTicket'); ?> :: Acceso agentes</title>
+    <title><?php echo Format::htmlchars($cfg->getTitle() ?: 'M.A.I.T.S'); ?>:: Acceso agentes</title>
     <link rel="stylesheet" href="css/login.css" type="text/css" />
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css?8d38b06"/>
     <!-- [M.A.I.T.S] Tamano adaptable y boton "Regresar" -->

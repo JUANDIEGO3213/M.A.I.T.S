@@ -86,6 +86,37 @@
     guardar('maits-ayuda-' + $a.data('ayuda'), '0');
   });
 
+  // ---------------------------------------------------------------------
+  // Menus desplegables (Estado, Asignar, Ordenar, Mas...).
+  // osTicket (jquery.dropdown.js) les resta dos veces lo que la pagina esta
+  // desplazada hacia abajo, asi que el menu aparecia separado del boton en
+  // pantallas donde hay que bajar con la rueda del mouse. Aqui se vuelve a
+  // colocar justo debajo del boton.
+  // ---------------------------------------------------------------------
+  function acomodarMenu(trigger) {
+    var $t = $(trigger), $d = $($t.attr('data-dropdown'));
+    if (!$d.length || !$d.is(':visible')) return;
+    var $padre = $d.offsetParent(), base = { top: 0, left: 0 };
+    if ($padre.length && $padre[0] !== document.documentElement) {
+      base = $padre.offset();
+      base.top += parseFloat($padre.css('border-top-width')) || 0;
+      base.left += parseFloat($padre.css('border-left-width')) || 0;
+    }
+    var left = $d.hasClass('anchor-right')
+      ? $t.offset().left - ($d.outerWidth() - $t.outerWidth() - 4)
+      : $t.offset().left;
+    $d.css({
+      top: $t.offset().top + $t.outerHeight() - base.top,
+      left: left - base.left
+    });
+  }
+  // osTicket detiene el clic (stopPropagation), por eso se escucha en la fase
+  // de captura y se acomoda el menu justo despues de que osTicket lo abre.
+  document.addEventListener('click', function (e) {
+    var t = e.target && e.target.closest ? e.target.closest('[data-dropdown]') : null;
+    if (t) setTimeout(function () { acomodarMenu(t); }, 0);
+  }, true);
+
   $(function () { iniciar(document); });
   $(document).on('pjax:end', function () { iniciar(document); });
   // Algunas barras se dibujan despues de cargar (ajax); revisar un poco despues
