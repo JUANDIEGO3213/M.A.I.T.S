@@ -189,7 +189,10 @@ if($ticket->isOverdue())
                         <li><a href="#tickets/<?php echo $ticket->getId();
                             ?>/release" class="ticket-action"
                              data-redirect="tickets.php?id=<?php echo $ticket->getId(); ?>" >
-                               <i class="icon-unlock"></i> <?php echo __('Release (unassign) Ticket'); ?></a></li>
+                               <i class="icon-unlock"></i> <?php
+                               // [M.A.I.T.S] La traduccion decia "Liberar (cancelar) Ticket", pero NO
+                               // cancela ni cierra: solo quita al agente/equipo asignado.
+                               echo 'Quitar asignación (liberar)'; ?></a></li>
                  <?php
                  }
                  if($ticket->isOpen() && $isManager) {
@@ -284,15 +287,9 @@ if($ticket->isOverdue())
                     echo sprintf('<span style="font-weight: 700; line-height: 26px;">%s</span>', __('PARENT'));
                 elseif ($ticket->isChild())
                     echo sprintf('<span style="font-weight: 700; line-height: 26px;">%s</span>', __('CHILD'));
-                if ($role->hasPerm(Ticket::PERM_REPLY)) { ?>
-                <a href="#post-reply" class="post-response action-button"
-                data-placement="bottom" data-toggle="tooltip"
-                title="<?php echo __('Post Reply'); ?>"><i class="icon-mail-reply"></i></a>
-                <?php
-                } ?>
-                <a href="#post-note" id="post-note" class="post-response action-button"
-                data-placement="bottom" data-toggle="tooltip"
-                title="<?php echo __('Post Internal Note'); ?>"><i class="icon-file-text"></i></a>
+                // [M.A.I.T.S] Se quitaron los botones "Responder" y "Nota interna" de esta
+                // barra: hacian lo mismo que las pestanas que estan al final de la pagina.
+                ?>
                 <?php // Status change options
                 echo TicketStatus::status_options();
                 ?>
