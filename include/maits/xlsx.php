@@ -93,7 +93,7 @@ class MaitsXlsx {
 <font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="Arial"/><family val="2"/></font>
 <font><sz val="10"/><color rgb="FF9C6500"/><name val="Arial"/><family val="2"/></font>
 <font><sz val="10"/><color rgb="FF006100"/><name val="Arial"/><family val="2"/></font>
-<font><sz val="11"/><name val="Century"/><family val="1"/></font>
+<font><sz val="10"/><name val="Century"/><family val="1"/></font>
 <font><i/><sz val="10"/><color rgb="FF595959"/><name val="Arial"/><family val="2"/></font>
 <font><sz val="10"/><name val="Arial"/><family val="2"/></font>
 <font><sz val="10"/><color rgb="FF9C0006"/><name val="Arial"/><family val="2"/></font>
@@ -122,7 +122,7 @@ class MaitsXlsx {
 <xf numFmtId="164" fontId="8" fillId="0" '.$borde.' xfId="0" applyFont="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>
 <xf numFmtId="0" fontId="4" fillId="3" '.$borde.' xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
 <xf numFmtId="0" fontId="5" fillId="4" '.$borde.' xfId="0" applyFont="1" applyFill="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
-<xf numFmtId="0" fontId="6" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center" wrapText="1"/></xf>
+<xf numFmtId="0" fontId="6" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="bottom" wrapText="1"/></xf>
 <xf numFmtId="0" fontId="8" fillId="0" '.$borde.' xfId="0" applyFont="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>
 <xf numFmtId="0" fontId="7" fillId="0" borderId="0" xfId="0" applyFont="1" applyAlignment="1"><alignment vertical="center"/></xf>
 <xf numFmtId="165" fontId="8" fillId="0" '.$borde.' xfId="0" applyFont="1" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="left" vertical="center"/></xf>

@@ -19,7 +19,22 @@ require_once INCLUDE_DIR . 'maits/xlsx.php';
 class MaitsReporte {
 
     const LIMITE = 20000;   // máximo de tickets por grupo
-    const FIRMA = 'FIRMA DEL INSTITUTO O ENCARGADO';
+    const LINEA_FIRMA = '______________________________';
+
+    /** Lineas del bloque de firma (ver include/maits/config-reporte.php) */
+    static function firma() {
+        $c = @include INCLUDE_DIR . 'maits/config-reporte.php';
+        $c = is_array($c) ? $c : array();
+        $lineas = array();
+        if (trim($c['nombre'] ?? '') !== '')
+            $lineas[] = trim($c['nombre']);
+        else
+            $lineas[] = 'Nombre y firma del responsable';
+        if (trim($c['cargo'] ?? '') !== '')
+            $lineas[] = trim($c['cargo']);
+        $lineas[] = trim($c['institucion'] ?? '') !== '' ? trim($c['institucion']) : 'Instituto Tecnológico de Saltillo';
+        return $lineas;
+    }
 
     // Grupos de tickets que se pueden incluir
     static $grupos = array(
@@ -292,7 +307,8 @@ class MaitsReporte {
                 $h['imagenes'][] = array('datos' => $logos['derecho']['datos'], 'ext' => $logos['derecho']['ext'],
                     'col' => $cLogo2, 'fila' => 0, 'ancho' => $w, 'alto' => $hh, 'dx' => $grande ? 58 : 6, 'dy' => 2);
             }
-            $h['filas'][0][$cFirma] = array(self::FIRMA, MaitsXlsx::E_FIRMA);
+            // Espacio para firmar, linea y debajo nombre / cargo / instituto
+            $h['filas'][0][$cFirma] = array("\n" . self::LINEA_FIRMA . "\n" . implode("\n", self::firma()), MaitsXlsx::E_FIRMA);
             for ($c = $cFirma + 1; $c <= $fFirma; $c++)
                 $h['filas'][0][$c] = array('', MaitsXlsx::E_FIRMA);
             if ($fFirma > $cFirma)
@@ -386,7 +402,8 @@ class MaitsReporte {
             body { font-family: arial, sans-serif; font-size: ' . $letra . 'pt; color:#1b1b1b; }
             table.cab { width:100%; border-collapse:collapse; margin-bottom:4px; }
             table.cab td { vertical-align:middle; }
-            .firma { font-family: serif; font-size:10.5pt; text-align:center; width:30%; height:70px; }
+            .firma { font-family: serif; font-size:9.5pt; text-align:center; vertical-align:bottom; width:30%; line-height:1.3; }
+            .firma .espacio { height:28px; }
             h1 { font-size:14pt; color:#1F4E78; margin:4px 0 2px; }
             .info { font-size:8.5pt; color:#555; margin-bottom:6px; }
             table.datos { width:100%; border-collapse:collapse; }
@@ -406,7 +423,8 @@ class MaitsReporte {
             $html .= '<table class="cab"><tr>'
                 . '<td style="width:35%">' . (isset($logos['izquierdo']) ? '<img src="var:logo_izquierdo" style="height:60px">' : '') . '</td>'
                 . '<td style="width:35%;text-align:center">' . (isset($logos['derecho']) ? '<img src="var:logo_derecho" style="height:70px">' : '') . '</td>'
-                . '<td class="firma">' . self::FIRMA . '</td></tr></table>';
+                . '<td class="firma"><div class="espacio"></div>' . self::LINEA_FIRMA . '<br>'
+                . implode('<br>', array_map(array('Format', 'htmlchars'), self::firma())) . '</td></tr></table>';
             $html .= '<h1>M.A.I.T.S — ' . Format::htmlchars($this->titulo($g)) . '</h1>';
             $html .= '<div class="info">Periodo: ' . Format::htmlchars($this->descripcionPeriodo($g))
                 . ' &nbsp;&nbsp; Total de tickets: <b>' . count($filas) . '</b>'
