@@ -58,7 +58,7 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css?8d38b06"/>
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH ?>scp/css/translatable.css?8d38b06"/>
     <!-- [M.A.I.T.S] Estilo propio del panel de agentes (va despues de scp.css) -->
-    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH ?>scp/css/maits-agentes.css?v=4"/>
+    <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH ?>scp/css/maits-agentes.css?v=5"/>
     <script type="text/javascript" src="<?php echo ROOT_PATH ?>scp/js/maits-agentes.js?v=3"></script>
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-32x32.png" sizes="32x32" />

@@ -66,14 +66,14 @@ if (in_array($accion, array('nuevo', 'editar'))) {
     <div class="maits-campo">
       <label>3. Miembros <span class="error">*</span></label>
       <input type="search" class="maits-filtro" placeholder="Buscar agente por nombre…"
-        oninput="var t=this.value.toLowerCase();$(this).closest('.maits-campo').find('.maits-agente').each(function(){$(this).toggle($(this).text().toLowerCase().indexOf(t)>=0);});">
+        oninput="var t=this.value.toLowerCase();$(this).closest('.maits-campo').find('.maits-opcion-agente').each(function(){$(this).toggle($(this).text().toLowerCase().indexOf(t)>=0);});">
       <?php if (!empty($errors['miembros'])) echo '<div class="maits-error">'.$h($errors['miembros']).'</div>'; ?>
       <div class="maits-agentes">
         <?php foreach ($agentes as $dept => $lista) { ?>
         <fieldset>
           <legend><?php echo $h($dept); ?></legend>
           <?php foreach ($lista as $s) { ?>
-          <label class="maits-agente">
+          <label class="maits-opcion-agente">
             <input type="checkbox" name="miembros[]" value="<?php echo $s->getId(); ?>"
               <?php if (in_array($s->getId(), $sel)) echo 'checked'; ?>>
             <?php echo $nombre($s); ?>
