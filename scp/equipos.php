@@ -42,8 +42,8 @@ if ($_POST && $accion == 'guardar' && $puede) {
 }
 
 $nav->setTabActive('equipos');
-if (in_array($accion, array('gestionar', 'nuevo', 'editar')))
-    $nav->setActiveSubMenu(2);
+// Marcar solo la opcion actual del submenu (las dos apuntan a equipos.php)
+$nav->setActiveSubMenu(in_array($accion, array('gestionar', 'nuevo', 'editar')) ? 2 : 1);
 $ost->setPageTitle(in_array($accion, array('gestionar', 'nuevo', 'editar'))
     ? 'Gestionar equipos' : 'Mi área');
 
