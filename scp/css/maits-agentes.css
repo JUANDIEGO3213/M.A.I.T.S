@@ -407,7 +407,7 @@ table.ticket_info { width: 100%; }
    Paginas nuevas: Equipos (Mi area / Gestionar) y Crear reporte
    ===================================================================== */
 a.maits-reporte { background:url(../images/icons/file.gif) }
-.maits-pagina { max-width: 72rem; }
+.maits-pagina { max-width: none; }  /* ocupa todo el ancho: los botones quedan en la misma orilla que "Ya entendí" */
 .maits-pagina h2 { margin-bottom: .3rem; }
 .maits-intro { margin: 0 0 1rem; color: var(--gris); max-width: 62rem; line-height: 1.5; }
 .maits-nota { color: var(--gris); font-size: .875rem; }
@@ -509,3 +509,5 @@ a.maits-btn-reporte {
 a.maits-btn-reporte:hover { background: #f6bc63; }
 a.maits-exportar-csv { font-size: .85rem; color: var(--gris) !important; }
 .maits-campo select { height: auto; min-height: 2.5rem; line-height: 1.3; background: #fff; color: var(--tinta); }
+/* El boton de la derecha (Gestionar / Crear equipo) alineado con "Ya entendí" */
+.maits-pagina .maits-titulo-fila { padding-right: calc(1rem + 1px); }
