@@ -29,6 +29,11 @@ if ($nav->isAdminPanel()) {
     $maits_clave = 'usuarios';
 } elseif (in_array($maits_script, array('kb.php', 'faq.php', 'categories.php', 'canned.php'))) {
     $maits_clave = 'kb';
+} elseif ($maits_script == 'equipos.php') {
+    $maits_clave = in_array($_REQUEST['a'] ?? '', array('gestionar', 'nuevo', 'editar', 'guardar'))
+        ? 'equipos-gestionar' : 'equipos';
+} elseif ($maits_script == 'reportes.php') {
+    $maits_clave = 'reportes';
 } elseif ($maits_script == 'dashboard.php') {
     $maits_clave = 'estadisticas';
 } elseif ($maits_script == 'directory.php') {
@@ -71,6 +76,18 @@ $maits_ayudas = array(
     'estadisticas' => array('Estadísticas', array(
         'Gráfica y tablas de cuántos tickets se crearon, cerraron o vencieron por periodo, departamento, tema o agente.',
         'Cambia las fechas arriba y presiona <strong>Actualizar</strong>. También puedes exportar los datos.',
+    )),
+    'equipos' => array('Mi área: con quién trabajas', array(
+        '<strong>Departamentos</strong>: las áreas donde recibes tickets, tu rol en cada una y quién es el gerente.',
+        '<strong>Equipos</strong>: los grupos de agentes a los que perteneces y quién es su líder.',
+    )),
+    'equipos-gestionar' => array('Gestionar equipos', array(
+        'Crea un equipo, elige a su <strong>líder</strong> (el encargado) y a sus <strong>miembros</strong>.',
+        'Después, desde un ticket, usa <strong>Asignar → Equipo</strong> para mandárselo a ese equipo.',
+    )),
+    'reportes' => array('Crear reporte', array(
+        'Sigue los 3 pasos: qué tickets, qué datos y el tipo de archivo. Lo marcado como <strong>Recomendado</strong> ya viene listo.',
+        '<strong>Excel</strong> sale con logos y colores; <strong>PDF</strong> sirve para imprimir; <strong>CSV</strong> es solo texto.',
     )),
     'directorio' => array('Directorio de agentes', array(
         'La lista del personal que atiende tickets, con su departamento y datos de contacto.',

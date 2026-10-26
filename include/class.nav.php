@@ -138,6 +138,9 @@ class StaffNav {
             $this->tabs['tasks'] = array('desc'=>__('Tasks'), 'href'=>'tasks.php', 'title'=>__('Task Queue'));
             $this->tabs['tickets'] = array('desc'=>__('Tickets'),'href'=>'tickets.php','title'=>__('Ticket Queue'));
 
+            // [M.A.I.T.S] Pestana "Equipos": con quien trabajo y en que area
+            $this->tabs['equipos'] = array('desc'=>'Equipos','href'=>'equipos.php','title'=>'Mis departamentos y equipos');
+
             $this->tabs['kbase'] = array('desc'=>__('Knowledgebase'),'href'=>'kb.php','title'=>__('Knowledgebase'));
             if (!is_null($this->getRegisteredApps()))
                 $this->tabs['apps']=array('desc'=>__('Applications'),'href'=>'apps.php','title'=>__('Applications'));
@@ -161,6 +164,15 @@ class StaffNav {
                     $subnav[]=array('desc'=>__('Dashboard'),'href'=>'dashboard.php','iconclass'=>'logs');
                     $subnav[]=array('desc'=>__('Agent Directory'),'href'=>'directory.php','iconclass'=>'teams');
                     $subnav[]=array('desc'=>__('My Profile'),'href'=>'profile.php','iconclass'=>'users');
+                    // [M.A.I.T.S] Generador de reportes (Excel / PDF / CSV)
+                    $subnav[]=array('desc'=>'Crear reporte','href'=>'reportes.php','iconclass'=>'maits-reporte');
+                    break;
+                case 'equipos':
+                    $subnav[]=array('desc'=>'Mi área','href'=>'equipos.php','iconclass'=>'departments',
+                        'title'=>'Departamentos y equipos en los que trabajas');
+                    if ($staff && class_exists('MaitsEquipos') && MaitsEquipos::puedeGestionar($staff))
+                        $subnav[]=array('desc'=>'Gestionar equipos','href'=>'equipos.php?a=gestionar','iconclass'=>'teams',
+                            'title'=>'Crear equipos y elegir su líder y miembros');
                     break;
                 case 'users':
                     $subnav[] = array('desc' => __('User Directory'), 'href' => 'users.php', 'iconclass' => 'teams');

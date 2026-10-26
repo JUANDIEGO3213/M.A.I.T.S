@@ -300,10 +300,15 @@ foreach ($tickets as $T) {
 <?php
         echo __('Page').':'.$pageNav->getPageLinks().'&nbsp;';
         ?>
-        <a href="#tickets/export/<?php echo $queue->getId(); ?>"
-        id="queue-export" class="no-pjax export"
-            ><?php echo __('Export'); ?></a>
-        <i class="help-tip icon-question-sign" href="#export"></i>
+        <?php // [M.A.I.T.S] Boton visible para crear el reporte (Excel / PDF / CSV)
+        $maits_grupo = preg_match('/cerrad|closed/i', $queue->getName()) ? 'cerrados' : 'abiertos'; ?>
+        <span class="maits-exportar">
+          <a href="reportes.php?grupo=<?php echo $maits_grupo; ?>" class="no-pjax maits-btn-reporte"
+            title="Crear un reporte en Excel o PDF con logos"><i class="icon-download-alt"></i> Crear reporte (Excel / PDF)</a>
+          <a href="#tickets/export/<?php echo $queue->getId(); ?>"
+            id="queue-export" class="no-pjax export maits-exportar-csv"
+            title="Descargar exactamente esta lista en CSV">Exportar esta lista (CSV)</a>
+        </span>
     </div>
 <?php
     } ?>
