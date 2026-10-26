@@ -41,6 +41,7 @@ define('KB_PREMADE_TABLE',TABLE_PREFIX.'kb_premade');
 
 require_once(INCLUDE_DIR.'class.staff.php');
 require_once(INCLUDE_DIR.'class.csrf.php');
+require_once(INCLUDE_DIR.'class.maits.php'); // [M.A.I.T.S] permisos y funciones propias
 
 /* First order of the day is see if the user is logged in and with a valid session.
     * User must be valid staff beyond this point

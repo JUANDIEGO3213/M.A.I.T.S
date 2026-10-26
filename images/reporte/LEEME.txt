@@ -1,0 +1,7 @@
+Logos del reporte de tickets (scp/reportes.php)
+
+  logo_izquierdo.png  -> arriba a la izquierda (Tecnológico Nacional de México)
+  logo_derecho.png    -> arriba al centro (escudo del ITS Saltillo)
+
+Para cambiarlos, reemplaza estos archivos por otros con el MISMO nombre
+(PNG o JPG). No hace falta tocar el código.

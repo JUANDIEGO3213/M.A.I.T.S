@@ -6,6 +6,7 @@ $maits_tabs = array(
     'tickets'   => array('icon-inbox',     'Tickets',              'Los reportes que mandan los usuarios'),
     'tasks'     => array('icon-check',     'Tareas',               'Trabajo interno entre agentes (el usuario no las ve)'),
     'users'     => array('icon-group',     'Usuarios',             'Las personas que han creado tickets'),
+    'equipos'   => array('icon-sitemap',   'Equipos',              'Tus departamentos y equipos de trabajo'),
     'kbase'     => array('icon-book',      'Base de conocimientos','Respuestas predefinidas y preguntas frecuentes'),
     'dashboard' => array('icon-bar-chart', 'Estadísticas',         'Gráficas de tickets, directorio de agentes y tu perfil'),
     'apps'      => array('icon-th-large',  null,                   null),
