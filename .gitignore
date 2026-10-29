@@ -1,0 +1,9 @@
+# Configuración con contraseñas de la base de datos: nunca subirla al repo
+include/ost-config.php
+# Respaldos de editores y archivos temporales
+*.save
+*.bak
+*~
+.DS_Store
+# Carpeta de instalación de osTicket (debe borrarse en producción)
+setup/
