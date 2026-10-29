@@ -530,22 +530,31 @@ class MaitsReporte {
         $out = fopen('php://temp', 'w+');
         fwrite($out, "\xEF\xBB\xBF");  // para que Excel lea bien los acentos
         if ($this->opciones['fecha'])
-            fputcsv($out, array('Fecha del reporte: ' . $this->generado->format('d/m/Y')));
+            self::filaCsv($out, array('Fecha del reporte: ' . $this->generado->format('d/m/Y')));
         $multi = count($this->opciones['grupos']) > 1;
         $enc = array_map(function ($c) use ($todas) { return $todas[$c][0]; }, $cols);
-        fputcsv($out, $multi ? array_merge(array('Grupo'), $enc) : $enc);
+        self::filaCsv($out, $multi ? array_merge(array('Grupo'), $enc) : $enc);
         foreach (array_keys($this->opciones['grupos']) as $g) {
             foreach ($this->recorrer($g) as $f) {
                 $linea = array();
                 foreach ($cols as $c)
                     $linea[] = self::celdaCsv($f[$c][0] ?? '');
-                fputcsv($out, $multi ? array_merge(array(self::$grupos[$g][0]), $linea) : $linea);
+                self::filaCsv($out, $multi ? array_merge(array(self::$grupos[$g][0]), $linea) : $linea);
             }
         }
         rewind($out);
         $res = stream_get_contents($out);
         fclose($out);
         return $res;
+    }
+
+    /**
+     * fputcsv() con el escape explícito: desde PHP 8.4 omitirlo es obsoleto
+     * (su valor por defecto cambiará). '' sigue el estándar CSV (RFC 4180),
+     * que es como Excel lee las comillas.
+     */
+    static function filaCsv($out, $campos) {
+        return fputcsv($out, $campos, ',', '"', '');
     }
 
     /**

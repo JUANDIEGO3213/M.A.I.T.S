@@ -1,7 +1,8 @@
 # Pruebas de M.A.I.T.S
 
 Herramientas usadas para probar el sistema antes de producción. El resultado
-está en [INFORME-QA.md](INFORME-QA.md).
+está en [INFORME-QA.md](INFORME-QA.md). Qué cuidar al actualizar PHP, Ubuntu u
+osTicket está en [COMPATIBILIDAD.md](COMPATIBILIDAD.md).
 
 > **No usar en producción.** Estos scripts crean agentes y tickets de prueba
 > con contraseñas conocidas. Úsalos solo en una copia de pruebas. La carpeta
