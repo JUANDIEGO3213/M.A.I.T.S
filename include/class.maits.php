@@ -108,19 +108,42 @@ class MaitsEquipos {
         if ($lider && !in_array($lider, $miembros))
             $miembros[] = $lider;
 
+        // Solo agentes activos (el formulario solo muestra esos, pero un POST
+        // armado a mano podía guardar un líder inexistente: Team::update()
+        // guarda el equipo ANTES de revisar a los miembros)
+        $activos = array();
+        if ($miembros)
+            foreach (Staff::objects()
+                    ->filter(array('staff_id__in' => $miembros, 'isactive' => 1))
+                    ->values_flat('staff_id') as $fila)
+                $activos[] = (int) $fila[0];
+        if (array_diff($miembros, $activos))
+            $errors['miembros'] = 'Uno o más agentes elegidos no existen o están inactivos.';
+
+        // Conservar los avisos que un administrador haya configurado; los
+        // miembros nuevos reciben avisos del equipo
         $alertas = array();
+        $previos = array();
+        if ($team->getId())
+            foreach ($team->members as $m)
+                $previos[$m->staff_id] = $m->isAlertsEnabled() ? 1 : 0;
         foreach ($miembros as $id)
-            $alertas[$id] = 1;  // los miembros reciben avisos del equipo
+            $alertas[$id] = $previos[$id] ?? 1;
 
         $datos = array(
             'id'        => $team->getId() ?: 0,
-            'name'      => trim($vars['nombre'] ?? ''),
+            // sin etiquetas HTML: Team::update() las quita al guardar, así
+            // que hay que quitarlas antes para que "ya existe" funcione
+            'name'      => trim(Format::striptags($vars['nombre'] ?? '')),
             'lead_id'   => $lider,
             'isenabled' => !empty($vars['activo']) ? 1 : 0,
             'notes'     => $vars['notas'] ?? '',
             'members'   => $miembros,
             'member_alerts' => $alertas,
         );
+        // Team::update() apaga "sin avisos" si no viene la llave
+        if ($team->getId() && ($team->flags & Team::FLAG_NOALERTS))
+            $datos['noalerts'] = 1;
         if (!$datos['name'])
             $errors['nombre'] = 'Escribe el nombre del equipo.';
         if (!$miembros)
