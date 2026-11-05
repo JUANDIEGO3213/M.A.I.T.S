@@ -18,7 +18,10 @@ require_once INCLUDE_DIR . 'maits/xlsx.php';
 
 class MaitsReporte {
 
-    const LIMITE = 20000;   // máximo de tickets por grupo
+    const LIMITE = 50000;     // máximo de tickets por grupo (Excel y CSV)
+    const LIMITE_PDF = 2000;  // el PDF tarda ~8 ms y usa ~0.1 MB por ticket
+    const BLOQUE_PDF = 100;   // filas por cada WriteHTML() del PDF
+    const MEMORIA = '512M';   // memoria mínima para generar el archivo
     const LINEA_FIRMA = '______________________________';
 
     /** Lineas del bloque de firma (ver include/maits/config-reporte.php) */
@@ -83,6 +86,7 @@ class MaitsReporte {
     var $tz;
     var $dbtz;
     var $generado;   // DateTime local
+    var $totales = array();   // grupo => número de tickets (ver contar())
 
     function __construct(Staff $staff, $opciones) {
         global $cfg;
@@ -176,18 +180,9 @@ class MaitsReporte {
         return sprintf('%s: del %s al %s', ucfirst($que), self::dmy($desde), self::dmy($hasta));
     }
 
-    /** Filas de un grupo: lista de arrays [ruta => [texto, valor]] + estado */
-    function filas($g) {
+    /** Tickets de un grupo (periodo + lo que el agente puede ver), sin columnas */
+    function consulta($g) {
         list($p, $desde, $hasta) = $this->opciones['grupos'][$g];
-        $todas = CustomQueue::getExportableFields();
-        $campos = array();
-        foreach ($this->opciones['columnas'] as $c)
-            $campos[$c] = $todas[$c];
-        // siempre necesitamos el estado para dar color
-        if (!isset($campos['status__id']))
-            $campos['status__id'] = $todas['status__id'];
-
-        $cola = new CustomQueue(array('root' => 'T', 'flags' => CustomQueue::FLAG_QUEUE));
         $query = Ticket::objects();
         if ($g == 'abiertos')
             $query->filter(array('status__state' => 'open'));
@@ -205,23 +200,81 @@ class MaitsReporte {
         }
         // Solo lo que el agente puede ver
         $query->filter($this->staff->getTicketsVisibility());
+        return $query;
+    }
 
+    /** Cuántos tickets tiene un grupo */
+    function contar($g) {
+        if (!isset($this->totales[$g]))
+            $this->totales[$g] = $this->consulta($g)->distinct('ticket_id')->count();
+        return $this->totales[$g];
+    }
+
+    /** Máximo de tickets por grupo según el formato */
+    function limite() {
+        return $this->opciones['formato'] == 'pdf' ? self::LIMITE_PDF : self::LIMITE;
+    }
+
+    /**
+     * Revisa que ningún grupo pase del máximo. Antes el reporte se cortaba
+     * sin avisar (o se quedaba sin memoria); ahora se pide acotar el periodo.
+     */
+    function validarTamano(&$errores) {
+        $max = $this->limite();
+        foreach (array_keys($this->opciones['grupos']) as $g) {
+            if (($n = $this->contar($g)) <= $max)
+                continue;
+            $errores['periodo'][$g] = sprintf(
+                'Este grupo tiene %s tickets y el máximo por reporte %s es %s. Elige un periodo más corto%s.',
+                number_format($n), $this->opciones['formato'] == 'pdf' ? 'en PDF' : '',
+                number_format($max),
+                $this->opciones['formato'] == 'pdf' ? ' o usa Excel, que admite hasta ' . number_format(self::LIMITE) : '');
+        }
+        return empty($errores);
+    }
+
+    /** Filas de un grupo: lista de arrays [ruta => [texto, valor]] + estado */
+    function filas($g) {
+        return iterator_to_array($this->recorrer($g), false);
+    }
+
+    /**
+     * Igual que filas() pero entrega una fila a la vez (generador), para no
+     * tener en memoria miles de tickets al armar Excel o CSV.
+     */
+    function recorrer($g) {
+        $todas = CustomQueue::getExportableFields();
+        $campos = array();
+        foreach ($this->opciones['columnas'] as $c)
+            $campos[$c] = $todas[$c];
+        // siempre necesitamos el estado para dar color
+        if (!isset($campos['status__id']))
+            $campos['status__id'] = $todas['status__id'];
+
+        $cola = new CustomQueue(array('root' => 'T', 'flags' => CustomQueue::FLAG_QUEUE));
+        $query = $this->consulta($g);
         $columnas = $cola->getExportColumns($campos);
         foreach ($columnas as $col)
             $query = $col->mangleQuery($query, 'T');
         $query->setOption(QuerySet::OPT_NOCACHE, true);
         $query->order_by($g == 'cerrados' ? '-closed' : '-created')
-            ->distinct('ticket_id')->limit(self::LIMITE);
+            ->distinct('ticket_id')->limit($this->limite());
 
-        $estados = array();
-        foreach (TicketStatus::objects() as $s)
+        $estados = $nombresEstado = array();
+        foreach (TicketStatus::objects() as $s) {
             $estados[$s->getId()] = $s->getState();
+            $nombresEstado[$s->getId()] = $s->getLocalName();
+        }
 
-        $filas = array();
         foreach ($query as $row) {
             $f = array();
             foreach ($columnas as $ruta => $col) {
-                $texto = (string) $col->from_query($row);
+                // El nombre del estado se toma de la lista ya cargada: con un
+                // agente en sesión, from_query() consulta la lista de estados
+                // en la base de datos por CADA ticket (20 000 consultas extra).
+                $texto = ($ruta == 'status__id')
+                    ? (string) ($nombresEstado[$row['status__id'] ?? 0] ?? '')
+                    : (string) $col->from_query($row);
                 // Si osTicket no dio texto, usar el valor tal cual, excepto los
                 // identificadores (ej. agente "0" = sin asignar -> vacio)
                 if ($texto === '' && !preg_match('/(_id|__id)$/', $ruta))
@@ -235,9 +288,8 @@ class MaitsReporte {
             }
             $f['_estado'] = $estados[$row['status__id'] ?? 0] ?? '';
             $f['_atrasado'] = !empty($row['isoverdue']);
-            $filas[] = $f;
+            yield $f;
         }
-        return $filas;
     }
 
     function titulo($g) {
@@ -282,9 +334,8 @@ class MaitsReporte {
         $logos = self::logos();
 
         foreach (array_keys($this->opciones['grupos']) as $g) {
-            $filas = $this->filas($g);
             $h = array('nombre' => self::$grupos[$g][0], 'filas' => array(), 'altos' => array(),
-                'anchos' => array(), 'combinar' => array(), 'imagenes' => array());
+                'anchos' => array(), 'combinar' => array(), 'imagenes' => array(), 'xml_datos' => '');
             foreach ($cols as $i => $c)
                 $h['anchos'][$i] = $todas[$c][3];
 
@@ -314,27 +365,16 @@ class MaitsReporte {
             if ($fFirma > $cFirma)
                 $h['combinar'][] = MaitsXlsx::col($cFirma) . '1:' . MaitsXlsx::col($fFirma) . '1';
 
-            // Fila 2: de qué es el reporte, periodo, total y fecha del reporte
-            $h['altos'][1] = 22;
-            $partes = array(array($this->titulo($g) . '   ', true),
-                array('Periodo: ', true), array($this->descripcionPeriodo($g) . '   '),
-                array('Total de tickets: ', true), array(count($filas) . '   '));
-            if ($this->opciones['fecha']) {
-                $partes[] = array('Fecha del reporte: ', true);
-                $partes[] = array($this->generado->format('d/m/Y'));
-            }
-            $h['filas'][1][0] = array($partes, MaitsXlsx::E_INFO, 'r');
-            $h['combinar'][] = 'A2:' . MaitsXlsx::col($ultima) . '2';
-
             // Fila 3: encabezados (azul, letra blanca)
             $fe = 2;
             $h['altos'][$fe] = 30;
             foreach ($cols as $i => $c)
                 $h['filas'][$fe][$i] = array($todas[$c][0], MaitsXlsx::E_ENCABEZADO);
 
-            // Datos
+            // Datos: cada fila se convierte a XML en cuanto se lee, para no
+            // guardar en memoria todos los tickets (con 20 000 se acababa)
             $r = $fe + 1;
-            foreach ($filas as $f) {
+            foreach ($this->recorrer($g) as $f) {
                 // Alto de la fila segun el texto mas largo (Excel no lo calcula solo)
                 $lineas = 1;
                 foreach ($cols as $i => $c) {
@@ -342,31 +382,46 @@ class MaitsReporte {
                     $largo = mb_strlen($f[$c][0] ?? '');
                     $lineas = max($lineas, (int) ceil($largo / max(1, $todas[$c][3] * 1.1)));
                 }
-                $h['altos'][$r] = min(15 * $lineas + 3, 120);
+                $fila = array();
                 foreach ($cols as $i => $c) {
                     list($texto, $valor) = $f[$c] ?? array('', null);
                     if ($c == 'status__id') {
                         $e = $f['_estado'] == 'open' ? MaitsXlsx::E_ABIERTO : MaitsXlsx::E_CERRADO;
-                        $h['filas'][$r][$i] = array($texto, $e);
+                        $fila[$i] = array($texto, $e);
                     } elseif (in_array($c, self::$fechas)) {
                         $estilo = $c == 'closed' ? MaitsXlsx::E_FECHA_SOLA : MaitsXlsx::E_FECHA;
-                        $h['filas'][$r][$i] = $valor ? array(MaitsXlsx::serial($valor), $estilo, 'd')
-                                                     : array('', MaitsXlsx::E_CELDA);
+                        $fila[$i] = $valor ? array(MaitsXlsx::serial($valor), $estilo, 'd')
+                                           : array('', MaitsXlsx::E_CELDA);
                     } elseif ($c == 'isoverdue' && $f['_atrasado']) {
-                        $h['filas'][$r][$i] = array($texto, MaitsXlsx::E_ATRASADO);
+                        $fila[$i] = array($texto, MaitsXlsx::E_ATRASADO);
                     } elseif (in_array($c, array('thread_count', 'reopen_count', 'attachment_count', 'task_count')) && is_numeric($texto)) {
-                        $h['filas'][$r][$i] = array($texto, MaitsXlsx::E_NUMERO, 'n');
+                        $fila[$i] = array($texto, MaitsXlsx::E_NUMERO, 'n');
                     } elseif ($c == 'number' && ctype_digit($texto)) {
                         // como texto para conservar ceros a la izquierda
-                        $h['filas'][$r][$i] = array($texto, MaitsXlsx::E_CENTRO);
+                        $fila[$i] = array($texto, MaitsXlsx::E_CENTRO);
                     } else {
-                        $h['filas'][$r][$i] = array($texto, in_array($c, self::$centradas)
+                        $fila[$i] = array($texto, in_array($c, self::$centradas)
                             ? MaitsXlsx::E_CENTRO : MaitsXlsx::E_CELDA);
                     }
                 }
+                $h['xml_datos'] .= MaitsXlsx::filaXml($r, $fila, min(15 * $lineas + 3, 120));
                 $r++;
             }
-            if (!$filas) {
+            $total = $r - $fe - 1;
+
+            // Fila 2: de qué es el reporte, periodo, total y fecha del reporte
+            $h['altos'][1] = 22;
+            $partes = array(array($this->titulo($g) . '   ', true),
+                array('Periodo: ', true), array($this->descripcionPeriodo($g) . '   '),
+                array('Total de tickets: ', true), array($total . '   '));
+            if ($this->opciones['fecha']) {
+                $partes[] = array('Fecha del reporte: ', true);
+                $partes[] = array($this->generado->format('d/m/Y'));
+            }
+            $h['filas'][1][0] = array($partes, MaitsXlsx::E_INFO, 'r');
+            $h['combinar'][] = 'A2:' . MaitsXlsx::col($ultima) . '2';
+
+            if (!$total) {
                 $h['filas'][$r][0] = array('No hay tickets en este periodo.', MaitsXlsx::E_SUBTITULO);
                 $r++;
             }
@@ -430,30 +485,38 @@ class MaitsReporte {
                 . ' &nbsp;&nbsp; Total de tickets: <b>' . count($filas) . '</b>'
                 . ($this->opciones['fecha'] ? ' &nbsp;&nbsp; Fecha del reporte: <b>' . $this->generado->format('d/m/Y') . '</b>' : '')
                 . '</div>';
-            $html .= '<table class="datos" repeat_header="1"><thead><tr>';
-            foreach ($cols as $c)
-                $html .= '<th>' . Format::htmlchars($todas[$c][0]) . '</th>';
-            $html .= '</tr></thead><tbody>';
-            foreach ($filas as $i => $f) {
-                $html .= '<tr' . ($i % 2 ? ' class="par"' : '') . '>';
-                foreach ($cols as $c) {
-                    $t = Format::htmlchars($f[$c][0] ?? '');
-                    if ($c == 'status__id')
-                        $html .= '<td class="' . ($f['_estado'] == 'open' ? 'abierto' : 'cerrado') . '">' . $t . '</td>';
-                    elseif ($c == 'isoverdue' && $f['_atrasado'])
-                        $html .= '<td class="atrasado">' . $t . '</td>';
-                    else
-                        $html .= '<td' . ((in_array($c, self::$centradas) || in_array($c, self::$fechas)) ? ' class="c"' : '') . '>' . $t . '</td>';
-                }
-                $html .= '</tr>';
-            }
-            if (!$filas)
-                $html .= '<tr><td colspan="' . $n . '" class="c">No hay tickets en este periodo.</td></tr>';
-            $html .= '</tbody></table>';
             if (!$primero)
                 $pdf->AddPage();
             $pdf->WriteHTML($html);
             $primero = false;
+
+            // La tabla se escribe en bloques: un solo WriteHTML() con miles de
+            // filas pasa el limite pcre.backtrack_limit de mPDF (error fatal
+            // desde ~1 500 tickets) y además usa mucha más memoria.
+            $enc = '<table class="datos" repeat_header="1"><thead><tr>';
+            foreach ($cols as $c)
+                $enc .= '<th>' . Format::htmlchars($todas[$c][0]) . '</th>';
+            $enc .= '</tr></thead><tbody>';
+            foreach (array_chunk($filas, self::BLOQUE_PDF, true) as $bloque) {
+                $html = $enc;
+                foreach ($bloque as $i => $f) {
+                    $html .= '<tr' . ($i % 2 ? ' class="par"' : '') . '>';
+                    foreach ($cols as $c) {
+                        $t = Format::htmlchars($f[$c][0] ?? '');
+                        if ($c == 'status__id')
+                            $html .= '<td class="' . ($f['_estado'] == 'open' ? 'abierto' : 'cerrado') . '">' . $t . '</td>';
+                        elseif ($c == 'isoverdue' && $f['_atrasado'])
+                            $html .= '<td class="atrasado">' . $t . '</td>';
+                        else
+                            $html .= '<td' . ((in_array($c, self::$centradas) || in_array($c, self::$fechas)) ? ' class="c"' : '') . '>' . $t . '</td>';
+                    }
+                    $html .= '</tr>';
+                }
+                $pdf->WriteHTML($html . '</tbody></table>');
+            }
+            if (!$filas)
+                $pdf->WriteHTML($enc . '<tr><td colspan="' . $n . '" class="c">No hay tickets en este periodo.</td></tr></tbody></table>');
+            unset($filas);
         }
         return $pdf->Output('', 'S');
     }
@@ -467,16 +530,16 @@ class MaitsReporte {
         $out = fopen('php://temp', 'w+');
         fwrite($out, "\xEF\xBB\xBF");  // para que Excel lea bien los acentos
         if ($this->opciones['fecha'])
-            fputcsv($out, array('Fecha del reporte: ' . $this->generado->format('d/m/Y')));
+            self::filaCsv($out, array('Fecha del reporte: ' . $this->generado->format('d/m/Y')));
         $multi = count($this->opciones['grupos']) > 1;
         $enc = array_map(function ($c) use ($todas) { return $todas[$c][0]; }, $cols);
-        fputcsv($out, $multi ? array_merge(array('Grupo'), $enc) : $enc);
+        self::filaCsv($out, $multi ? array_merge(array('Grupo'), $enc) : $enc);
         foreach (array_keys($this->opciones['grupos']) as $g) {
-            foreach ($this->filas($g) as $f) {
+            foreach ($this->recorrer($g) as $f) {
                 $linea = array();
                 foreach ($cols as $c)
-                    $linea[] = $f[$c][0] ?? '';
-                fputcsv($out, $multi ? array_merge(array(self::$grupos[$g][0]), $linea) : $linea);
+                    $linea[] = self::celdaCsv($f[$c][0] ?? '');
+                self::filaCsv($out, $multi ? array_merge(array(self::$grupos[$g][0]), $linea) : $linea);
             }
         }
         rewind($out);
@@ -485,9 +548,46 @@ class MaitsReporte {
         return $res;
     }
 
+    /**
+     * fputcsv() con el escape explícito: desde PHP 8.4 omitirlo es obsoleto
+     * (su valor por defecto cambiará). '' sigue el estándar CSV (RFC 4180),
+     * que es como Excel lee las comillas.
+     */
+    static function filaCsv($out, $campos) {
+        return fputcsv($out, $campos, ',', '"', '');
+    }
+
+    /**
+     * Evita la "inyección de fórmulas" (CSV injection): un asunto escrito por
+     * el usuario como =HYPERLINK(...) o +cmd|... se ejecutaría como fórmula al
+     * abrir el CSV en Excel. Se antepone un apóstrofo (recomendación OWASP).
+     */
+    static function celdaCsv($texto) {
+        $texto = (string) $texto;
+        return ($texto !== '' && strpos("=+-@\t\r", $texto[0]) !== false) ? "'" . $texto : $texto;
+    }
+
+    /** Sube memory_limit si es menor que MEMORIA (nunca lo baja) */
+    static function asegurarMemoria() {
+        $bytes = function ($v) {
+            $v = trim((string) $v);
+            if ($v === '' || $v === '-1') return PHP_INT_MAX;
+            $n = (int) $v;
+            switch (strtolower(substr($v, -1))) {
+                case 'g': $n *= 1024;
+                case 'm': $n *= 1024;
+                case 'k': $n *= 1024;
+            }
+            return $n;
+        };
+        if ($bytes(ini_get('memory_limit')) < $bytes(self::MEMORIA))
+            @ini_set('memory_limit', self::MEMORIA);
+    }
+
     /** Genera el archivo y lo manda al navegador */
     function descargar() {
         @set_time_limit(300);
+        self::asegurarMemoria();
         switch ($this->opciones['formato']) {
             case 'pdf':  $datos = $this->pdf();   $tipo = 'application/pdf'; break;
             case 'csv':  $datos = $this->csv();   $tipo = 'text/csv; charset=UTF-8'; break;

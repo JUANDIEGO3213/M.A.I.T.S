@@ -16,7 +16,8 @@ if ($_POST && ($_POST['a'] ?? '') == 'generar') {
     $opciones = MaitsReporte::leerOpciones($_POST, $errores);
     if (!$errores) {
         $reporte = new MaitsReporte($thisstaff, $opciones);
-        $reporte->descargar();   // termina aqui
+        if ($reporte->validarTamano($errores))
+            $reporte->descargar();   // termina aqui
     }
     $errors = $errores;
     $errors['err'] = 'No se pudo crear el reporte. Revisa lo que está marcado en rojo.';

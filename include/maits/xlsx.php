@@ -144,6 +144,27 @@ class MaitsXlsx {
         return $x;
     }
 
+    /** Una fila (indice desde 0) con sus celdas: col => array(valor, estilo, tipo) */
+    static function filaXml($f, $celdas, $alto = null) {
+        $x = sprintf('<row r="%d"%s>', $f + 1, $alto ? sprintf(' ht="%.1f" customHeight="1"', $alto) : '');
+        ksort($celdas);
+        foreach ($celdas as $c => $cel) {
+            list($valor, $estilo, $tipo) = array_pad($cel, 3, 's');
+            $ref = self::col($c) . ($f + 1);
+            if ($valor === null || $valor === '') {
+                $x .= sprintf('<c r="%s" s="%d"/>', $ref, $estilo);
+            } elseif ($tipo == 'r') {
+                $x .= sprintf('<c r="%s" s="%d" t="inlineStr"><is>%s</is></c>', $ref, $estilo, self::textoRico($valor));
+            } elseif ($tipo == 'n' || $tipo == 'd') {
+                $x .= sprintf('<c r="%s" s="%d"><v>%s</v></c>', $ref, $estilo, 0 + $valor);
+            } else {
+                $x .= sprintf('<c r="%s" s="%d" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>',
+                    $ref, $estilo, self::xml($valor));
+            }
+        }
+        return $x . '</row>';
+    }
+
     private function hojaXml($i, $h, $tieneDibujo) {
         $x = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
            . '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" '
@@ -163,26 +184,10 @@ class MaitsXlsx {
         }
         $x .= '<sheetData>';
         ksort($h['filas']);
-        foreach ($h['filas'] as $f => $celdas) {
-            $alto = $h['altos'][$f] ?? null;
-            $x .= sprintf('<row r="%d"%s>', $f + 1, $alto ? sprintf(' ht="%.1f" customHeight="1"', $alto) : '');
-            ksort($celdas);
-            foreach ($celdas as $c => $cel) {
-                list($valor, $estilo, $tipo) = array_pad($cel, 3, 's');
-                $ref = self::col($c) . ($f + 1);
-                if ($valor === null || $valor === '') {
-                    $x .= sprintf('<c r="%s" s="%d"/>', $ref, $estilo);
-                } elseif ($tipo == 'r') {
-                    $x .= sprintf('<c r="%s" s="%d" t="inlineStr"><is>%s</is></c>', $ref, $estilo, self::textoRico($valor));
-                } elseif ($tipo == 'n' || $tipo == 'd') {
-                    $x .= sprintf('<c r="%s" s="%d"><v>%s</v></c>', $ref, $estilo, 0 + $valor);
-                } else {
-                    $x .= sprintf('<c r="%s" s="%d" t="inlineStr"><is><t xml:space="preserve">%s</t></is></c>',
-                        $ref, $estilo, self::xml($valor));
-                }
-            }
-            $x .= '</row>';
-        }
+        foreach ($h['filas'] as $f => $celdas)
+            $x .= self::filaXml($f, $celdas, $h['altos'][$f] ?? null);
+        // Filas ya convertidas a XML (datos del reporte, ver MaitsReporte::excel)
+        $x .= $h['xml_datos'] ?? '';
         $x .= '</sheetData>';
         if (!empty($h['filtro']))
             $x .= '<autoFilter ref="' . $h['filtro'] . '"/>';

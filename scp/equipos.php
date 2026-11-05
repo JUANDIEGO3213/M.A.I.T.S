@@ -35,7 +35,7 @@ if ($_POST && $accion == 'guardar' && $puede) {
             : sprintf('Equipo "%s" actualizado.', Format::htmlchars($equipo->getName()));
         Http::redirect('equipos.php?a=gestionar');
     }
-    if (!$errors['err'])
+    if (empty($errors['err']))
         $errors['err'] = 'Revisa los datos marcados en rojo.';
     $accion = $nuevo ? 'nuevo' : 'editar';
     if ($nuevo) $equipo = null;
