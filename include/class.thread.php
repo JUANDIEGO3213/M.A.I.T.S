@@ -1659,6 +1659,13 @@ implements TemplateVariable {
         // Ensure valid external images
         $body = Format::stripExternalImages($body);
 
+        // [M.A.I.T.S] Censurar palabras ofensivas (Administrar → Censuras)
+        require_once INCLUDE_DIR.'maits/censura.php';
+        $body = ($vars['body']->getType() == 'html')
+            ? MaitsCensura::html($body) : MaitsCensura::texto($body);
+        if (isset($vars['title']))
+            $vars['title'] = MaitsCensura::texto($vars['title']);
+
         $poster = $vars['poster'];
         if ($poster && is_object($poster))
             $poster = (string) $poster;
