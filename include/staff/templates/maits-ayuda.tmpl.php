@@ -14,7 +14,9 @@ $maits_script = basename($_SERVER['SCRIPT_NAME']);
 $maits_tab = $nav->getActiveTab();
 $maits_clave = null;
 
-if ($nav->isAdminPanel()) {
+if ($maits_script == 'censuras.php') {
+    $maits_clave = 'censuras';
+} elseif ($nav->isAdminPanel()) {
     $maits_clave = 'admin';
 } elseif ($maits_script == 'tickets.php' || $maits_script == 'index.php') {
     if (!empty($_REQUEST['id']))
@@ -94,6 +96,12 @@ $maits_ayudas = array(
     )),
     'perfil' => array('Mi perfil', array(
         'Cambia tu nombre, teléfono, contraseña, firma para las respuestas y preferencias (idioma, zona horaria, avisos por correo).',
+    )),
+    'censuras' => array('Censuras: palabras que no se permiten', array(
+        'Cuando alguien crea un ticket o escribe un mensaje, las palabras de esta lista se cambian por <strong>asteriscos</strong> (una * por cada letra) en cuanto se envía. Así lo ven los usuarios, los agentes y los correos.',
+        'No importan mayúsculas, acentos, letras repetidas ni números en lugar de letras (<em>PUUUTO</em> o <em>p3nd3jo</em> también se censuran) y se incluyen los plurales (<em>menso</em> → <em>mensos</em>).',
+        'Solo se censura la <strong>palabra completa</strong>: "puta" no afecta a "computadora". Si quieres todo lo que <strong>empiece</strong> igual, termina la palabra con * (<em>pendej*</em> → pendejo, pendeja, pendejada).',
+        '<strong>Agregar censura</strong> (verde) para sumar palabras, <strong>Eliminar censura</strong> (rojo) para quitar las que marques, y haz clic en una palabra para corregirla. Abajo puedes <strong>probar</strong> un texto. Los tickets que ya existían no cambian.',
     )),
     'admin' => array('Panel de administración', array(
         'Aquí se configura todo el sistema: departamentos, temas de ayuda, agentes, correos y más.',

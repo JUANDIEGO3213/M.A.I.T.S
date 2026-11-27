@@ -50,7 +50,7 @@ if (osTicket::is_ie())
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/rtl.css?8d38b06"/>
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/select2.min.css?8d38b06"/>
     <!-- Estilos de M.A.I.T.S (van al final para tener prioridad) -->
-    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/maits.css?v=2" media="screen"/>
+    <link rel="stylesheet" href="<?php echo ASSETS_PATH; ?>css/maits.css?v=3" media="screen"/>
     <!-- Favicons -->
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-32x32.png" sizes="64x64" />
     <link rel="icon" type="image/png" href="<?php echo ROOT_PATH ?>images/oscar-favicon-16x16.png" sizes="16x16" />
@@ -62,7 +62,8 @@ if (osTicket::is_ie())
     <script src="<?php echo ROOT_PATH; ?>js/bootstrap-typeahead.js?8d38b06"></script>
     <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor.min.js?8d38b06"></script>
     <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-plugins.js?8d38b06"></script>
-    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-osticket.js?8d38b06"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-osticket.js?8d38b06m1"></script>
+    <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/maits-imagenes.js?v=1"></script>
     <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/select2.min.js?8d38b06"></script>
     <?php
     if($ost && ($headers=$ost->getExtraHeaders())) {
@@ -106,7 +107,25 @@ if (osTicket::is_ie())
                 <img src="<?php echo ROOT_PATH; ?>logo.php" border=0 alt="<?php
                 echo $ost->getConfig()->getTitle(); ?>">
             </a>
-            <div class="maits-cuenta">
+            <?php
+            // [M.A.I.T.S] Convivencia de logotipos (Manual de Identidad TecNM 2025,
+            // 1.4 "Instituto Tecnologico Federal o Centro" y 3.1 Proporcion):
+            // Educacion (SEP) | linea dorada | TecNM  ITS Saltillo (al 80%)
+            $maits_logos = ASSETS_PATH.'images/institucional/'; ?>
+            <div class="maits-institucional" role="img"
+                aria-label="Secretaría de Educación Pública, Tecnológico Nacional de México e Instituto Tecnológico de Saltillo">
+                <span class="maits-inst-grupo">
+                    <img class="maits-inst-sep" src="<?php echo $maits_logos; ?>educacion-sep.png" alt="Educación, Secretaría de Educación Pública">
+                    <span class="maits-inst-linea" aria-hidden="true"></span>
+                </span>
+                <span class="maits-inst-grupo">
+                    <img class="maits-inst-tecnm" src="<?php echo $maits_logos; ?>tecnm.png" alt="Tecnológico Nacional de México">
+                    <img class="maits-inst-its" src="<?php echo $maits_logos; ?>its-saltillo.png" alt="Instituto Tecnológico de Saltillo">
+                </span>
+            </div>
+            <div class="maits-cuenta<?php
+                if ($thisclient && is_object($thisclient) && $thisclient->isValid()
+                    && !$thisclient->isGuest()) echo ' maits-con-sesion'; ?>">
              <?php
                 // [M.A.I.T.S] Zona de la cuenta: nombre del usuario y botones claros
                 if ($thisclient && is_object($thisclient) && $thisclient->isValid()

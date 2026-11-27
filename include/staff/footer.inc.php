@@ -51,7 +51,8 @@ if(is_object($thisstaff) && $thisstaff->isStaff()) { ?>
 <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/select2.min.js?8d38b06"></script>
 <script type="text/javascript" src="<?php echo ROOT_PATH; ?>scp/js/tips.js?8d38b06"></script>
 <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor.min.js?8d38b06"></script>
-<script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-osticket.js?8d38b06"></script>
+<script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-osticket.js?8d38b06m1"></script>
+<script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/maits-imagenes.js?v=1"></script>
 <script type="text/javascript" src="<?php echo ROOT_PATH; ?>js/redactor-plugins.js?8d38b06"></script>
 <script type="text/javascript" src="<?php echo ROOT_PATH; ?>scp/js/jquery.translatable.js?8d38b06"></script>
 <script type="text/javascript" src="<?php echo ROOT_PATH; ?>scp/js/jquery.dropdown.js?8d38b06"></script>

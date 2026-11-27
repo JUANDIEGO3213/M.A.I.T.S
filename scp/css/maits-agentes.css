@@ -11,20 +11,42 @@
      - Administracion:     misma base, con etiqueta roja de "cuidado".
    ===================================================================== */
 
+/* Tipografias del Manual de Identidad Grafica TecNM 2025 (1.3):
+   - Noto Sans: todo el texto.
+   - Patria: solo titulos destacados. Si el archivo no esta en
+     fonts/patria/ (ver LEEME.txt), se usa Noto Sans en su lugar. */
 @font-face {
-  font-family: "Atkinson Hyperlegible";
-  src: url("../../assets/default/fonts/atkinson/atkinson-hyperlegible-latin-400-normal.woff2") format("woff2");
+  font-family: "Noto Sans";
+  src: url("../../assets/default/fonts/noto-sans/noto-sans-latin-400-normal.woff2") format("woff2");
   font-weight: 400; font-style: normal; font-display: swap;
 }
 @font-face {
-  font-family: "Atkinson Hyperlegible";
-  src: url("../../assets/default/fonts/atkinson/atkinson-hyperlegible-latin-400-italic.woff2") format("woff2");
+  font-family: "Noto Sans";
+  src: url("../../assets/default/fonts/noto-sans/noto-sans-latin-400-italic.woff2") format("woff2");
   font-weight: 400; font-style: italic; font-display: swap;
 }
 @font-face {
-  font-family: "Atkinson Hyperlegible";
-  src: url("../../assets/default/fonts/atkinson/atkinson-hyperlegible-latin-700-normal.woff2") format("woff2");
+  font-family: "Noto Sans";
+  src: url("../../assets/default/fonts/noto-sans/noto-sans-latin-600-normal.woff2") format("woff2");
+  font-weight: 600; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Noto Sans";
+  src: url("../../assets/default/fonts/noto-sans/noto-sans-latin-700-normal.woff2") format("woff2");
   font-weight: 700; font-style: normal; font-display: swap;
+}
+@font-face {
+  font-family: "Noto Sans";
+  src: url("../../assets/default/fonts/noto-sans/noto-sans-latin-700-italic.woff2") format("woff2");
+  font-weight: 700; font-style: italic; font-display: swap;
+}
+@font-face {
+  font-family: "Patria";
+  src: local("Patria"), local("Patria Regular"),
+       url("../../assets/default/fonts/patria/Patria-Regular.woff2") format("woff2"),
+       url("../../assets/default/fonts/patria/Patria-Regular.otf") format("opentype"),
+       url("../../assets/default/fonts/patria/Patria-Regular.ttf") format("truetype");
+  font-weight: 100 900; font-style: normal; font-display: swap;
 }
 
 :root {
@@ -41,7 +63,8 @@
   --borde: #d9d4e6;
   --hoja: #ffffff;
   --radio: 10px;
-  --letra: "Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif;
+  --letra: "Noto Sans", "Segoe UI", Arial, sans-serif;
+  --titulo: "Patria", "Noto Sans", "Segoe UI", Arial, sans-serif;
 }
 
 /* ---------- Tamano segun la pantalla (sin zoom) ---------- */
@@ -511,3 +534,45 @@ a.maits-exportar-csv { font-size: .85rem; color: var(--gris) !important; }
 .maits-campo select { height: auto; min-height: 2.5rem; line-height: 1.3; background: #fff; color: var(--tinta); }
 /* El boton de la derecha (Gestionar / Crear equipo) alineado con "Ya entendí" */
 .maits-pagina .maits-titulo-fila { padding-right: calc(1rem + 1px); }
+
+/* ---------- Censuras (Administrar → Censuras) ---------- */
+.maits-censuras h2 { margin: .3rem 0 .6rem; }
+.maits-censuras h2 a { color: var(--noche); }
+.maits-cens-migas { font-weight: 400; color: var(--gris); font-size: 1.1rem; }
+.maits-censuras #actions { display: flex; gap: .5rem; align-items: center; }
+a.maits-btn-verde, button.maits-btn-verde, a.maits-btn-rojo, input.maits-btn-rojo, button.maits-btn-guardar {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .5rem .95rem; border-radius: 6px; border: 0;
+  font-weight: 700; font-size: .9rem; line-height: 1.2; color: #fff !important;
+  text-decoration: none !important; cursor: pointer; height: auto;
+}
+a.maits-btn-verde, button.maits-btn-verde { background: #1e8e3e; }
+a.maits-btn-verde:hover, button.maits-btn-verde:hover { background: #166c2f; }
+a.maits-btn-rojo, input.maits-btn-rojo { background: #c62828; }
+a.maits-btn-rojo:hover, input.maits-btn-rojo:hover { background: #9f1d1d; }
+button.maits-btn-guardar { background: var(--violeta); }
+button.maits-btn-guardar:hover { background: var(--noche); }
+.maits-cens-resumen {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .6rem;
+  margin: .4rem 0 .7rem; color: var(--gris);
+}
+.maits-cens-resumen input[type=search] { width: 16rem; max-width: 100%; padding: .4rem .6rem; border: 1px solid var(--borde); }
+.maits-cens-tabla td a { font-weight: 700; }
+.maits-cens-tipo { color: var(--gris); }
+.maits-cens-tarjeta {
+  background: #fff; border: 1px solid var(--borde); border-radius: var(--radio);
+  padding: 1rem 1.2rem; margin: 1rem 0; max-width: 46rem;
+}
+.maits-cens-etiqueta { display: block; font-weight: 700; color: var(--noche); font-size: 1rem; }
+.maits-cens-ayuda { margin: .25rem 0 .6rem; color: var(--gris); }
+.maits-cens-tarjeta textarea, .maits-cens-tarjeta input[type=text] {
+  width: 100%; box-sizing: border-box; padding: .55rem .7rem; border: 1px solid var(--borde); font-size: 1rem;
+}
+.maits-cens-tarjeta input[type=text] { max-width: 24rem; }
+.maits-cens-botones { display: flex; gap: .6rem; align-items: center; margin-top: .8rem; }
+.maits-cens-error { color: #b42318; font-weight: 700; margin-top: .35rem; }
+.maits-cens-dato { color: var(--gris); font-size: .85rem; margin: .6rem 0 0; }
+.maits-cens-resultado { margin-top: .9rem; padding: .7rem .9rem; background: var(--violeta-claro); border-radius: 8px; }
+.maits-cens-resultado span { display: block; font-size: .8rem; color: var(--gris); margin-bottom: .2rem; }
+.maits-cens-resultado div { font-size: 1.05rem; color: var(--tinta); word-break: break-word; }
+.maits-cens-resultado em { display: block; margin-top: .3rem; color: var(--gris); font-size: .85rem; }
