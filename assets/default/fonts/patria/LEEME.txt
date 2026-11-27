@@ -1,0 +1,15 @@
+Tipografia "Patria" (Manual de Identidad Grafica TecNM 2025, 1.3)
+=================================================================
+Se usa SOLO en los titulos destacados del portal (por ejemplo
+"¡Bienvenido a M.A.I.T.S!" y el titulo principal de cada pagina).
+
+Mientras no este el archivo aqui, esos titulos se ven en Noto Sans.
+
+Para activarla:
+  1. Consigue el archivo de la fuente Patria (la distribuye el
+     Gobierno de Mexico; tambien puede pedirse al area de Difusion).
+  2. Copialo en esta carpeta con UNO de estos nombres:
+        Patria-Regular.woff2   (recomendado)
+        Patria-Regular.otf
+        Patria-Regular.ttf
+  3. Abre la pagina con Ctrl+F5. No hay que tocar el codigo.

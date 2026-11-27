@@ -11,7 +11,7 @@ header("Content-Security-Policy: frame-ancestors ".$cfg->getAllowIframes()."; sc
     <link rel="stylesheet" href="css/login.css" type="text/css" />
     <link type="text/css" rel="stylesheet" href="<?php echo ROOT_PATH; ?>css/font-awesome.min.css?8d38b06"/>
     <!-- [M.A.I.T.S] Tamano adaptable y boton "Regresar" -->
-    <link rel="stylesheet" href="css/maits-login.css?v=2" type="text/css" />
+    <link rel="stylesheet" href="css/maits-login.css?v=3" type="text/css" />
     <meta name="robots" content="noindex" />
     <meta http-equiv="cache-control" content="no-cache" />
     <meta http-equiv="pragma" content="no-cache" />
