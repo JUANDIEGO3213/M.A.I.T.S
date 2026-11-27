@@ -4388,6 +4388,25 @@ implements RestrictedAccess, Threadable, Searchable {
         if ($subject && !$subject->getValue() && $topic)
             $subject->setValue($topic->getFullName());
 
+        // [M.A.I.T.S] Censurar palabras ofensivas en el asunto
+        if ($sfield = $form->getField('subject')) {
+            require_once INCLUDE_DIR.'maits/censura.php';
+            $actual = $sfield->getClean();
+            if (is_string($actual) && $actual !== ''
+                    && ($limpio = MaitsCensura::texto($actual)) !== $actual) {
+                // osTicket guarda el valor desde el campo de la respuesta y
+                // desde el del formulario: se cambian los dos
+                if ($subject) {
+                    $subject->setValue($limpio);
+                    $subject->getField()->value = $limpio;
+                }
+                $sfield->reset();
+                $sfield->value = $limpio;
+            }
+            if (isset($vars['subject']) && is_string($vars['subject']))
+                $vars['subject'] = MaitsCensura::texto($vars['subject']);
+        }
+
         $form->setTicketId($ticket->getId());
         $form->save();
 
