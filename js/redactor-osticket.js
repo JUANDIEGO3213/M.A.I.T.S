@@ -143,12 +143,26 @@
             this.onautosave(null, null, response);
         },
         uploadError: function (response) {
-            this.displayError(response);
+            // [M.A.I.T.S] Mensaje claro y sin dejar la imagen rota en el editor
+            var e = (response && response.error) || '',
+                motivos = {
+                    'File is too large': 'La imagen pesa más de lo permitido. Intenta con una foto más pequeña o una captura de pantalla.',
+                    'File type is not allowed': 'Ese tipo de archivo no se permite. Usa una imagen JPG o PNG.',
+                    'File is not valid': 'El archivo no es una imagen válida.'
+                };
+            try {
+                $(this.app.editor.getElement().get()).find('img').filter(function() {
+                    var s = $(this).attr('src') || '';
+                    return !s || s.indexOf('blob:') === 0 || s.indexOf('data:') === 0;
+                }).remove();
+            } catch (x) {}
+            $.sysAlert('No se pudo subir la imagen',
+                motivos[e] || 'Ocurrió un problema al subir la imagen. Vuelve a intentarlo o adjúntala en "Soltar archivos aquí".');
         }
     },
 
     displayError: function(json) {
-        $.sysAlert(json.error,
+        $.sysAlert((json && json.error) || 'No se pudo guardar el borrador',
             __('Unable to save draft.')
           + ' ' + __('Refresh the current page to restore and continue your draft.'));
     },
@@ -387,6 +401,12 @@ $(function() {
                 'imageManagerJson': 'ajax.php/draft/images/browse',
                 'imagePosition': true,
                 'imageUploadData': {
+                    '__CSRFToken__': $("meta[name=csrf_token]").attr("content")
+                },
+                // [M.A.I.T.S] Redactor lee el token de "imageData" (no de
+                // "imageUploadData"); sin esto las imágenes del editor se
+                // rechazan por CSRF y quedan rotas en el ticket.
+                'imageData': {
                     '__CSRFToken__': $("meta[name=csrf_token]").attr("content")
                 },
                 'imageResizable': true,
